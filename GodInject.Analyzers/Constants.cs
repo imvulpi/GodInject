@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace GodInject.Analyzers
+﻿namespace GodInject.Analyzers
 {
     public static class Constants
     {
@@ -11,5 +7,6 @@ namespace GodInject.Analyzers
         public const string MANAGED_INJECT_ATTRIBUTE_NAMESPACE = "GodInject.ManagedInjectionAttribute";
         public const string MANAGED_FUNCTION_NAME = "InjectAll";
         public const string MANAGED_INJECT_PARAMETERLESS_PROPERTY = "AllowParameterless";
+        public const string CONTAINER_CLASS_NAME = "InjectContainer";
     }
 }
