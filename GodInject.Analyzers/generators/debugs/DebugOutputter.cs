@@ -1,4 +1,5 @@
-﻿using GodInject.Analyzers.generators.data;
+﻿#if DEBUG
+using GodInject.Analyzers.generators.data;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
@@ -113,3 +114,4 @@ namespace GodInject.Analyzers.generators.debugs
         }
     }
 }
+#endif

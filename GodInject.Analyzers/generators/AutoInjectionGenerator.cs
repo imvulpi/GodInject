@@ -1,6 +1,5 @@
 ﻿using GodInject.Analyzers.generators.builder;
 using GodInject.Analyzers.generators.data;
-using GodInject.Analyzers.generators.debugs;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -20,8 +19,12 @@ namespace GodInject.Analyzers.generators
                     predicate: CaptureClassSyntax,
                     transform: ConvertToClass);
             var compilationAndClasses = context.CompilationProvider.Combine(classDeclarations.Collect());
-            DebugOutputter debugOutputter = new DebugOutputter();
+
+            #if DEBUG
+            debugs.DebugOutputter debugOutputter = new debugs.DebugOutputter();
             debugOutputter.Initialize(context, compilationAndClasses);
+            #endif
+
             context.RegisterSourceOutput(compilationAndClasses, (spc, source) =>
             {
                 var (compilation, classList) = source;
@@ -36,7 +39,7 @@ namespace GodInject.Analyzers.generators
                         InjectedDataMembers injectedDataMembers = new InjectedDataMembers();
                         injectedDataMembers.InjectedFields = injectedDataMembers.GetInjectedFields(classSymbol, injectAttributeSymbol);
                         injectedDataMembers.InjectedProperties = injectedDataMembers.GetInjectedProperties(classSymbol, injectAttributeSymbol);
-                        InjectClassBuilder injectClassBuilder = new InjectClassBuilder();
+                        InjectClassBuilder injectClassBuilder = new InjectClassBuilder();                        
                         if (injectedDataMembers.InjectedProperties.Length > 0 || injectedDataMembers.InjectedFields.Length > 0)
                         {
                             var managedInjectAttributeSymbol = compilation.GetTypeByMetadataName(Constants.MANAGED_INJECT_ATTRIBUTE_NAMESPACE);
