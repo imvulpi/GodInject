@@ -66,7 +66,7 @@ namespace GodInject.Analyzers.generators.builder
 
         private string GetTextResolvingProperties(InjectedProperty[] injectProperties, string linePrefix = "")
         {
-            var textsResolvingProperties = injectProperties.Select(prop => $"{prop.PropertySymbol.Name} = {Constants.CONTAINER_CLASS_NAME}.Resolve<{prop.PropertySymbol.Type}>({(prop.ServiceKey == string.Empty ? "" : $"\"{prop.ServiceKey}\"")});");
+            var textsResolvingProperties = injectProperties.Select(prop => $"{prop.PropertySymbol.Name} = {Constants.CONTAINER_CLASS_NAME}.Resolve<{prop.PropertySymbol.Type}>({(prop.ServiceKey == null ? "" : $"\"{prop.ServiceKey}\"")});");
             string combinedTextsResolvingProperties = "";
             bool firstProperty = true;
             foreach (var text in textsResolvingProperties)
@@ -86,7 +86,7 @@ namespace GodInject.Analyzers.generators.builder
 
         private string GetTextResolvingFields(InjectedField[] injectFields, string linePrefix = "")
         {
-            var textsResolvingProperties = injectFields.Select(field => $"{field.PropertySymbol.Name} = {Constants.CONTAINER_CLASS_NAME}.Resolve<{field.PropertySymbol.Type}>({(field.ServiceKey == string.Empty ? "" : $"\"{field.ServiceKey}\"")});");
+            var textsResolvingProperties = injectFields.Select(field => $"{field.PropertySymbol.Name} = {Constants.CONTAINER_CLASS_NAME}.Resolve<{field.PropertySymbol.Type}>({(field.ServiceKey == null ? "" : $"\"{field.ServiceKey}\"")});");
             string combinedTextsResolvingProperties = "";
             bool firstProperty = true;
             foreach (var text in textsResolvingProperties)

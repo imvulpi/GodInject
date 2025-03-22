@@ -22,7 +22,12 @@ namespace GodInject.Analyzers.generators.data
                 if (injectAttribute != null && injectAttribute.ConstructorArguments.Length > 0)
                 {
                     var serviceKey = injectAttribute.ConstructorArguments[0].IsNull ? string.Empty : (string)injectAttribute.ConstructorArguments[0].Value;
-                    InjectedProperty injectedProperty = new(property, serviceKey);
+                    InjectedProperty injectedProperty = new InjectedProperty(property, serviceKey);
+                    injectedProperties.Add(injectedProperty);
+                }
+                else
+                {
+                    InjectedProperty injectedProperty = new InjectedProperty(property, null);
                     injectedProperties.Add(injectedProperty);
                 }
             }
@@ -42,9 +47,14 @@ namespace GodInject.Analyzers.generators.data
                 var injectAttribute = field.GetAttributes().FirstOrDefault(attr => SymbolEqualityComparer.IncludeNullability.Equals(attr.AttributeClass, injectAttributeSymbol));
                 if (injectAttribute != null && injectAttribute.ConstructorArguments.Length > 0)
                 {
-                    var serviceKey = injectAttribute.ConstructorArguments[0].IsNull ? string.Empty : (string)injectAttribute.ConstructorArguments[0].Value;
-                    InjectedField injectedProperty = new(field, serviceKey);
-                    injectedFields.Add(injectedProperty);
+                    var serviceKey = injectAttribute.ConstructorArguments.FirstOrDefault().IsNull ? string.Empty : (string)injectAttribute.ConstructorArguments.FirstOrDefault().Value;
+                    InjectedField injectedField = new InjectedField(field, serviceKey);
+                    injectedFields.Add(injectedField);
+                }
+                else
+                {
+                    InjectedField injectedField = new InjectedField(field, null);
+                    injectedFields.Add(injectedField);
                 }
             }
             return injectedFields.ToArray();

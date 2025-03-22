@@ -1,8 +1,11 @@
 ﻿using GodInject.Analyzers.generators.builder;
 using GodInject.Analyzers.generators.data;
+using GodInject.Analyzers.generators.debugs;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 using System.Linq;
+using System.Text;
 using System.Threading;
 
 namespace GodInject.Analyzers.generators
@@ -16,9 +19,9 @@ namespace GodInject.Analyzers.generators
                 .CreateSyntaxProvider(
                     predicate: CaptureClassSyntax,
                     transform: ConvertToClass);
-
             var compilationAndClasses = context.CompilationProvider.Combine(classDeclarations.Collect());
-
+            DebugOutputter debugOutputter = new DebugOutputter();
+            debugOutputter.Initialize(context, compilationAndClasses);
             context.RegisterSourceOutput(compilationAndClasses, (spc, source) =>
             {
                 var (compilation, classList) = source;
@@ -30,10 +33,10 @@ namespace GodInject.Analyzers.generators
                         var injectAttributeSymbol = compilation.GetTypeByMetadataName(Constants.INJECT_ATTRIBUTE_NAMESPACE);
                         var className = classSymbol.Name;
 
-                        InjectedDataMembers injectedDataMembers = new();
+                        InjectedDataMembers injectedDataMembers = new InjectedDataMembers();
                         injectedDataMembers.InjectedFields = injectedDataMembers.GetInjectedFields(classSymbol, injectAttributeSymbol);
                         injectedDataMembers.InjectedProperties = injectedDataMembers.GetInjectedProperties(classSymbol, injectAttributeSymbol);
-                        InjectClassBuilder injectClassBuilder = new();
+                        InjectClassBuilder injectClassBuilder = new InjectClassBuilder();
                         if (injectedDataMembers.InjectedProperties.Length > 0 || injectedDataMembers.InjectedFields.Length > 0)
                         {
                             var managedInjectAttributeSymbol = compilation.GetTypeByMetadataName(Constants.MANAGED_INJECT_ATTRIBUTE_NAMESPACE);
@@ -43,18 +46,17 @@ namespace GodInject.Analyzers.generators
                             {
                                 if (attribute != null && (bool)attribute.ConstructorArguments[0].Value == true) // Allow parameterless
                                 {
-                                    spc.AddSource($"{classSymbol.Name}.g.cs", injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, true, true));
+                                    spc.AddSource($"{classSymbol.Name}.g.cs", SourceText.From(injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, true, true), Encoding.Unicode));
                                 }
                                 else
                                 {
-                                    spc.AddSource($"{classSymbol.Name}.g.cs", injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, true, false));
+                                    spc.AddSource($"{classSymbol.Name}.g.cs", SourceText.From(injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, true, false), Encoding.Unicode));
                                 }
                             }
                             else
                             {
                                 //// On default auto injection through a parameterless constructor
-                                spc.AddSource($"{classSymbol.Name}.g.cs", injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, false, true));
-                                
+                                spc.AddSource($"{classSymbol.Name}.g.cs", SourceText.From(injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, false, true), Encoding.Unicode));
                             }
                         }
                     }
