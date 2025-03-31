@@ -13,7 +13,7 @@ namespace GodInject.Analyzers.generators.builder
                 $"#nullable enable\n" +
                 $"using System;\n" +
                 $"using {Constants.INJECT_CONTAINER_NAMESPACE};\n" +
-                $"{(classSymbol.ContainingNamespace == null ? "" : $"namespace {classSymbol.ContainingNamespace};")}\n" +
+                $"{((classSymbol.ContainingNamespace.IsGlobalNamespace || classSymbol.ContainingNamespace == null) ? "" : $"namespace {classSymbol.ContainingNamespace};")}\n" +
                 $"public partial class {classSymbol.Name} {{\n" +
                 $"{classBody}" +
                 $"}}\n";
