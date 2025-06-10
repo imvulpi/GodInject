@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace GodInject.Analyzers.generators.data
+namespace GodInject.Prebuild.generators.data
 {
     public struct InjectedProperty
     {

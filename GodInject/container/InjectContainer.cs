@@ -17,7 +17,6 @@ namespace GodInject.container
         }
 
         private static readonly IContainer Container = null;
-
         public static IContainer GetContainer()
         {
             return Container;

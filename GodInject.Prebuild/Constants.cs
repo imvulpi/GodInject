@@ -1,4 +1,4 @@
-﻿namespace GodInject.Analyzers
+﻿namespace GodInject.Prebuild
 {
     public static class Constants
     {
@@ -10,5 +10,13 @@
         public const string CONTAINER_CLASS_NAME = "InjectContainer";
         public const string FRIENDLY_NAME_LIBRARY = "GodInject";
         public const string OPTION_DEBUG = "AIG_EnableDebug";
+        public const string OPTION_OUTPUT = "GeneratedOutputPath";
+
+        // Godot Specific:
+        public const string GODOT_NOTIFICATION_METHOD = "_Notification";
+        public const string USER_NOTIFICATION_METHOD = "HandleNotification";
+        public const string GODOT_NOTIFICATION_ARG_TYPE = "int";
+        public const string GODOT_NOTIFICATION_ARG_NAME = "what";
+        public const string GODOT_ENTERTREE_NOTIFICATION_VAL = "10";
     }
 }
