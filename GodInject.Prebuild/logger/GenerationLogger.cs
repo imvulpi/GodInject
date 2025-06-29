@@ -1,8 +1,8 @@
-﻿using System;
+﻿using GodInject.Prebuild.API.logging;
 
 namespace GodInject.Prebuild.logger
 {
-    public class GenerationLogger : ILogger
+    internal class GenerationLogger : ILogger
     {
         public GenerationLogger(string logsDirPath)
         {

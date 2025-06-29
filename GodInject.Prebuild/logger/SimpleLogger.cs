@@ -1,8 +1,8 @@
-﻿using System;
+﻿using GodInject.Prebuild.API.logging;
 
 namespace GodInject.Prebuild.logger
 {
-    public class SimpleLogger : ILogger
+    internal class SimpleLogger : ILogger
     {
         public void LogError(string message, Exception exception = null)
         {
