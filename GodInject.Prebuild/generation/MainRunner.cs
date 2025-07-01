@@ -33,9 +33,7 @@ namespace GodInject.Prebuild.generation
             Project project = workspace.AddProject(projectInfo);
             GenerationInfo currentGenerationInfo = new()
             {
-                FilesGeneratedCount = 0,
-                FilesCheckedCount = 0,
-                FilesIgnoredCount = 0,
+                DocumentsCheckedCount = 0,
             };
 
             IInternalGeneratorRegistry generatorRegistry = Dependencies.Container.Resolve<IInternalGeneratorRegistry>();
@@ -47,9 +45,10 @@ namespace GodInject.Prebuild.generation
 
             while (true)
             {
+                currentGenerationInfo.DocumentsCheckedCount = 0;
                 foreach (var document in project.Documents)
                 {
-                    currentGenerationInfo.FilesCheckedCount++;
+                    currentGenerationInfo.DocumentsCheckedCount++;
                     for (int i = 0; i < generators.Count; i++)
                     {
                         var generator = generators[i];

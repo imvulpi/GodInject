@@ -2,6 +2,10 @@
 
 namespace GodInject.Prebuild.API.IO
 {
+    /// <summary>
+    /// Used to get files and files metadata from system faster than <see cref="Directory"/>
+    /// Significant improvements on Windows, lesser improvements on Linux and other OSes.
+    /// </summary>
     public static class FastFileRetriever
     {
         private static readonly IFileRetriever _fileRetriever;

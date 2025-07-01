@@ -18,7 +18,6 @@ namespace GodInject.Generator.injection_generator
             ExecutionPaths = executionPaths;
             MissingSymbolsRegistry = symbolsRegistry;
         }
-        public string GeneratorName = "AutoInject Generator";
         public ExecutionSettings ExecutionSettings { get; set; }
         public ExecutionPaths ExecutionPaths { get; set; }
         public IMissingSymbolsRegistry MissingSymbolsRegistry { get; set; }
@@ -26,7 +25,7 @@ namespace GodInject.Generator.injection_generator
         private readonly InjectClassBuilder injectClassBuilder = new();
 
         public void Start() {
-            Logger?.LogInfo($"[{GeneratorName}] Starts");
+            Logger?.LogInfo($"[{ModEntry.ModuleName}] Generator Starts");
         }
 
         public async void Generate(Document document)
@@ -74,7 +73,7 @@ namespace GodInject.Generator.injection_generator
         }
 
         public void End() {
-            Logger?.LogInfo($"[{GeneratorName}] Ends");
+            Logger?.LogInfo($"[{ModEntry.ModuleName}] Generator Ends");
         }
     }
 }

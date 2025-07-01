@@ -24,10 +24,11 @@ namespace GodInject.Generator
             {
                 Logger = modContext.Logger,
             };
+
+            modContext.Logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Adding generator");
             IGeneratorRegistry registry = modContext.Resolve<IGeneratorRegistry>();
-            modContext.Logger.LogInfo($"{ModuleName} {ModuleVersion} - {registry}");
             registry.AddGenerator(generator);
-            modContext.Logger.LogInfo($"Added generator");
+            modContext.Logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Generator was added");
         }
     }
 }

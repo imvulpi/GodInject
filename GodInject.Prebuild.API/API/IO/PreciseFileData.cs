@@ -2,6 +2,9 @@
 
 namespace GodInject.Prebuild.API.IO
 {
+    /// <summary>
+    /// More manageable structure for file metadata.
+    /// </summary>
     public struct PreciseFileData
     {
         public long CreationTime;
@@ -14,12 +17,5 @@ namespace GodInject.Prebuild.API.IO
         public string? AlternateName;
         public string Name;
         public string Path;
-    }
-
-    public enum SourceType
-    {
-        WinNT,
-        Win32,
-        Other
     }
 }

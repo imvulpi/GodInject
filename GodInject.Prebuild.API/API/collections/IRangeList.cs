@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace GodInject.Prebuild.utils.collections
+﻿namespace GodInject.Prebuild.API.collections
 {
+    /// <summary>
+    /// Interface for a List collection supporting manipulation of ranges
+    /// </summary>
     public interface IRangeList<T> : IRangeCollection<T>, IList<T>
     {
     }

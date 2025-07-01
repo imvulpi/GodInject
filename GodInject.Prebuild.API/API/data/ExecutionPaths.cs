@@ -1,7 +1,7 @@
 ﻿namespace GodInject.Prebuild.API.data
 {
     /// <summary>
-    /// Contains full paths to various useful directories or files.
+    /// Data class used for storing absolute paths to certain special directories in the project
     /// </summary>
     public class ExecutionPaths
     {
@@ -23,7 +23,7 @@
             Directory.CreateDirectory(ModsDirPath);
         }
 
-        // Files
+        // Files:
         public string CsprojPath { get; set; }
         public string GenerationInfoPath { get; set; }
 

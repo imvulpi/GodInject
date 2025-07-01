@@ -1,6 +1,9 @@
-﻿using System;
-namespace GodInject.Prebuild.API.generation
+﻿namespace GodInject.Prebuild.API.generation
 {
+    /// <summary>
+    /// Registry used to add custom generators to the framework,
+    /// You can also remove the custom generators.
+    /// </summary>
     public interface IGeneratorRegistry
     {
         public void AddGenerator(IGenerator generator);

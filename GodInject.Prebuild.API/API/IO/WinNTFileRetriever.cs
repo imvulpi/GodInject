@@ -1,9 +1,13 @@
-﻿using GodInject.Prebuild.utils.collections;
+﻿using GodInject.Prebuild.API.collections;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace GodInject.Prebuild.API.IO
 {
+    /// <summary>
+    /// File retriever using WinNT API, Slightly faster than <see cref="Win32FileRetriever"/>
+    /// Uses ntdll.dll, and kernel.dll
+    /// </summary>
     public class WinNTFileRetriever : IFileRetriever
     {
         [StructLayout(LayoutKind.Sequential)]

@@ -1,7 +1,7 @@
 ﻿namespace GodInject.Prebuild.API.data
 {
     /// <summary>
-    /// Defines settings for all execution in this program
+    /// Data class defining rules/paths used in the project
     /// </summary>
     public class ExecutionSettings
     {

@@ -1,7 +1,11 @@
 ﻿using System.Collections;
 
-namespace GodInject.Prebuild.utils.collections
+namespace GodInject.Prebuild.API.collections
 {
+    /// <summary>
+    /// List supporting manipulation of ranges
+    /// A wrapper around regular system List, since it supports ranges.
+    /// </summary>
     public class RangeList<T> : IRangeList<T>
     {
         private readonly List<T> _list;

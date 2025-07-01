@@ -1,9 +1,13 @@
-﻿using GodInject.Prebuild.utils.collections;
+﻿using GodInject.Prebuild.API.collections;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
 namespace GodInject.Prebuild.API.IO
 {
+    /// <summary>
+    /// File retriever using Win32 API, allows retrieving files from older windows systems.
+    /// Uses kernel32.dll, is more stable
+    /// </summary>
     public class Win32FileRetriever : IFileRetriever
     {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]

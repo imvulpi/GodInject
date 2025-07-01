@@ -1,4 +1,4 @@
-﻿using GodInject.Prebuild.utils.collections;
+﻿using GodInject.Prebuild.API.collections;
 using System.Collections;
 using static GodInject.Prebuild.API.IO.Win32FileRetriever;
 using static GodInject.Prebuild.API.IO.WinNTFileRetriever;
@@ -9,7 +9,7 @@ namespace GodInject.Prebuild.API.IO
 #pragma warning disable CS8602 // Dereference of a possibly null reference. (SourceType tells us what will be null or not)
 
     /// <summary>
-    /// Fast structs for file metadata, please work on this as if it was an array,
+    /// A heavily optimized struct for file metadata, please work on this as if it was an array,
     /// use indexes and then process individual informations []
     /// </summary>
     public struct FileMetaRef : IEnumerable<FileMetaRef>
@@ -24,7 +24,7 @@ namespace GodInject.Prebuild.API.IO
 
         public readonly int Count;
         public int CurrentIndex = 0;
-        public readonly SourceType _type;
+        public readonly FileSourceType _type;
 
         private readonly IRangeList<FileInfo>? _otherArray;
         private readonly IRangeList<(FILE_DIRECTORY_INFORMATION info, string name)>? _winNTArray;
@@ -37,7 +37,7 @@ namespace GodInject.Prebuild.API.IO
             _winNTArray = array;
             _otherArray = null;
             _win32Array = null;
-            _type = SourceType.WinNT;
+            _type = FileSourceType.WinNT;
         }
 
         public FileMetaRef(IRangeList<WIN32_FIND_DATA> array)
@@ -46,7 +46,7 @@ namespace GodInject.Prebuild.API.IO
             _winNTArray = null;
             _otherArray = null;
             _win32Array = array;
-            _type = SourceType.Win32;
+            _type = FileSourceType.Win32;
         }
 
         public FileMetaRef(IRangeList<FileInfo> array)
@@ -55,78 +55,78 @@ namespace GodInject.Prebuild.API.IO
             _winNTArray = null;
             _win32Array = null;
             _otherArray = array;
-            _type = SourceType.Other;
+            _type = FileSourceType.Other;
         }
 
         public readonly string Name => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].name,
-            SourceType.Win32 => _win32Array[CurrentIndex].cFileName,
-            SourceType.Other => _otherArray[CurrentIndex].Name,
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].name,
+            FileSourceType.Win32 => _win32Array[CurrentIndex].cFileName,
+            FileSourceType.Other => _otherArray[CurrentIndex].Name,
             _ => throw new InvalidOperationException(),
         };
 
         public readonly long CreationTime => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.CreationTime,
-            SourceType.Win32 => (long)_win32Array[CurrentIndex].ftCreationTime.dwHighDateTime << 32 | (uint)_win32Array[CurrentIndex].ftCreationTime.dwLowDateTime,
-            SourceType.Other => _otherArray[CurrentIndex].CreationTime.ToFileTimeUtc(),
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.CreationTime,
+            FileSourceType.Win32 => (long)_win32Array[CurrentIndex].ftCreationTime.dwHighDateTime << 32 | (uint)_win32Array[CurrentIndex].ftCreationTime.dwLowDateTime,
+            FileSourceType.Other => _otherArray[CurrentIndex].CreationTime.ToFileTimeUtc(),
             _ => throw new InvalidOperationException()
         };
 
         public readonly long LastWriteTime => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.LastWriteTime,
-            SourceType.Win32 => (long)_win32Array[CurrentIndex].ftLastWriteTime.dwHighDateTime << 32 | (uint)_win32Array[CurrentIndex].ftLastWriteTime.dwLowDateTime,
-            SourceType.Other => _otherArray[CurrentIndex].LastWriteTime.ToFileTimeUtc(),
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.LastWriteTime,
+            FileSourceType.Win32 => (long)_win32Array[CurrentIndex].ftLastWriteTime.dwHighDateTime << 32 | (uint)_win32Array[CurrentIndex].ftLastWriteTime.dwLowDateTime,
+            FileSourceType.Other => _otherArray[CurrentIndex].LastWriteTime.ToFileTimeUtc(),
             _ => throw new InvalidOperationException()
         };
 
         public readonly long LastAccessTime => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.LastAccessTime,
-            SourceType.Win32 => (long)_win32Array[CurrentIndex].ftLastAccessTime.dwHighDateTime << 32 | (uint)_win32Array[CurrentIndex].ftLastAccessTime.dwLowDateTime,
-            SourceType.Other => _otherArray[CurrentIndex].LastWriteTime.ToFileTimeUtc(),
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.LastAccessTime,
+            FileSourceType.Win32 => (long)_win32Array[CurrentIndex].ftLastAccessTime.dwHighDateTime << 32 | (uint)_win32Array[CurrentIndex].ftLastAccessTime.dwLowDateTime,
+            FileSourceType.Other => _otherArray[CurrentIndex].LastWriteTime.ToFileTimeUtc(),
             _ => throw new InvalidOperationException()
         };
 
         public readonly long? ChangeTime => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.ChangeTime,
-            SourceType.Win32 => null,
-            SourceType.Other => null,
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.ChangeTime,
+            FileSourceType.Win32 => null,
+            FileSourceType.Other => null,
             _ => throw new InvalidOperationException()
         };
 
         public readonly long RealSize => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.EndOfFile,
-            SourceType.Win32 => (long)_win32Array[CurrentIndex].nFileSizeHigh << 32 | _win32Array[CurrentIndex].nFileSizeLow,
-            SourceType.Other => _otherArray[CurrentIndex].Length,
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.EndOfFile,
+            FileSourceType.Win32 => (long)_win32Array[CurrentIndex].nFileSizeHigh << 32 | _win32Array[CurrentIndex].nFileSizeLow,
+            FileSourceType.Other => _otherArray[CurrentIndex].Length,
             _ => throw new InvalidOperationException()
         };
 
         public readonly long? AllocationSize => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.AllocationSize,
-            SourceType.Win32 => null,
-            SourceType.Other => null,
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.AllocationSize,
+            FileSourceType.Win32 => null,
+            FileSourceType.Other => null,
             _ => throw new InvalidOperationException()
         };
 
         public readonly uint FileAttributes => _type switch
         {
-            SourceType.WinNT => _winNTArray[CurrentIndex].info.FileAttributes,
-            SourceType.Win32 => (uint)_win32Array[CurrentIndex].dwFileAttributes,
-            SourceType.Other => (uint)_otherArray[CurrentIndex].Attributes,
+            FileSourceType.WinNT => _winNTArray[CurrentIndex].info.FileAttributes,
+            FileSourceType.Win32 => (uint)_win32Array[CurrentIndex].dwFileAttributes,
+            FileSourceType.Other => (uint)_otherArray[CurrentIndex].Attributes,
             _ => throw new InvalidOperationException()
         };
 
         public readonly string? AlternateName => _type switch
         {
-            SourceType.WinNT => null,
-            SourceType.Win32 => _win32Array[CurrentIndex].cAlternateFileName,
-            SourceType.Other => null,
+            FileSourceType.WinNT => null,
+            FileSourceType.Win32 => _win32Array[CurrentIndex].cAlternateFileName,
+            FileSourceType.Other => null,
             _ => throw new InvalidOperationException()
         };
 
@@ -139,13 +139,13 @@ namespace GodInject.Prebuild.API.IO
 
             switch (_type)
             {
-                case SourceType.WinNT:
+                case FileSourceType.WinNT:
                     _winNTArray.AddRange(fileMetaRef._winNTArray);
                     break;
-                case SourceType.Win32:
+                case FileSourceType.Win32:
                     _win32Array.AddRange(fileMetaRef._win32Array);
                     break;
-                case SourceType.Other:
+                case FileSourceType.Other:
                     _otherArray.AddRange(fileMetaRef._otherArray);
                     break;
             };
