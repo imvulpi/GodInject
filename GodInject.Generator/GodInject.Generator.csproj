@@ -4,11 +4,14 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+	<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+	<DisableTransitiveProjectReferences>true</DisableTransitiveProjectReferences>
   </PropertyGroup>
-
   <ItemGroup>
 	  <PackageReference Include="Samboy063.Tomlet" Version="6.1.0" />
-	  <ProjectReference Include="..\GodInject.Prebuild.API\GodInject.Prebuild.API.csproj" />
+	  <ProjectReference Include="..\GodInject.Prebuild.API\GodInject.Prebuild.API.csproj">
+		  <Private>false</Private>
+		  <ExcludeAssets>runtime</ExcludeAssets>
+	  </ProjectReference>
   </ItemGroup>
-
 </Project>

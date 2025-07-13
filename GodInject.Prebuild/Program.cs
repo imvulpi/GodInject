@@ -127,6 +127,7 @@ namespace GodInject.Prebuild
                 path = Path.Join(projectDirPath, ExecutionSettings.GENERATOR_FILES_DEFAULT, "exec.conf"); // consts later
             }
 
+            Directory.CreateDirectory(path);
             return path;
         }
     }
