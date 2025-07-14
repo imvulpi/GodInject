@@ -63,6 +63,9 @@ namespace GodInject.Generator.injection_generator
 
         private void CreateClassFile(INamedTypeSymbol classSymbol, InjectedDataMembers injectedDataMembers)
         {
+            if (injectedDataMembers.InjectedFields.Length <= 0 && injectedDataMembers.InjectedProperties.Length <= 0)
+                return;
+
             string className = classSymbol.Name;
             string newSource = injectClassBuilder.CreateClass(classSymbol, injectedDataMembers, true, false);
 
