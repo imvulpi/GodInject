@@ -57,6 +57,9 @@ Place GodInject.Generator.dll into the Mods folder of the generator framework.
       <PackageReference Include="DryIoc.dll" Version="5.4.3" />
     </ItemGroup>
   ```
+### 7. FOR GODOT:
+In `exec.conf` include path to the GodotSharp.dll
+ReferencesRelativePaths = [ "./.godot/mono/temp/bin/Debug/GodotSharp.dll" ]
 
 ## Recommended project structure
 
