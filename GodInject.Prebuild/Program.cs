@@ -56,7 +56,7 @@ namespace GodInject.Prebuild
                 Dependencies.Container.RegisterInstance<GenerationInfo>(generationInfo);
             Dependencies.Container.RegisterInstance<IInternalGeneratorRegistry>(generatorRegistry);
             Dependencies.Container.RegisterInstance<IGeneratorRegistry>(generatorRegistry);
-            Dependencies.Container.RegisterInstance<IDependencyCollector>(new DependencyCollector(generationInfo, absoluteDllPaths));
+            Dependencies.Container.RegisterInstance<IDependencyCollector>(new DependencyCollector(generationInfo, absoluteDllPaths, generationPaths.GenerationOutputDirPath));
             Dependencies.Container.RegisterInstance<IDependencyResolver>(new DependencyResolver());
             Dependencies.Container.RegisterInstance<IInternalMissingSymbolsRegistry>(missingSymbolRegistry);            
             Dependencies.Container.RegisterInstance<IMissingSymbolsRegistry>(missingSymbolRegistry);
@@ -127,8 +127,15 @@ namespace GodInject.Prebuild
                 path = Path.Join(projectDirPath, ExecutionSettings.GENERATOR_FILES_DEFAULT, "exec.conf"); // consts later
             }
 
-            Directory.CreateDirectory(path);
-            return path;
+            string? directoryPath = Path.GetDirectoryName(path);
+            if (directoryPath != null) { 
+                Directory.CreateDirectory(directoryPath);
+                return path;
+            }
+            else
+            {
+                throw new ApplicationException("Could not get directory path of the exec.conf");
+            }
         }
     }
 }

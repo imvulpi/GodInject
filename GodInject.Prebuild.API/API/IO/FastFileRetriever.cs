@@ -48,7 +48,7 @@ namespace GodInject.Prebuild.API.IO
             return _fileRetriever.GetFilesAndDirectories(path, searchPattern, initialCapacity);
         }
 
-        public static IEnumerable<(string path, FileMetaRef metadata)> GetFilesRecursive(string path, string searchPattern, int initialCapacity = 0)
+        public static IEnumerable<(string path, FileMetaRef metadata)> GetFilesRecursive(string path, string searchPattern, string[]? excludeDirs = null, int initialCapacity = 0)
         {
             uint directoryBitValue = (uint)FileAttributes.Directory;
             FileMetaRef fileMetaRef = _fileRetriever.GetFilesAndDirectories(path, searchPattern, initialCapacity);
@@ -58,9 +58,12 @@ namespace GodInject.Prebuild.API.IO
                 {
                     string dirPath = Path.Join(path, fileMeta.Name);
                     yield return (dirPath, fileMeta);
-                    foreach (var childFileMeta in GetFilesRecursive(dirPath, searchPattern, initialCapacity))
+                    if (excludeDirs != null && !excludeDirs.Contains(dirPath))
                     {
-                        yield return childFileMeta;
+                        foreach (var childFileMeta in GetFilesRecursive(dirPath, searchPattern, excludeDirs, initialCapacity))
+                        {
+                            yield return childFileMeta;
+                        }
                     }
                 }
                 else

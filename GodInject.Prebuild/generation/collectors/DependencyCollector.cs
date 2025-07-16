@@ -7,19 +7,21 @@ namespace GodInject.Prebuild.generation.collectors
 {
     public class DependencyCollector : IDependencyCollector
     {
-        public DependencyCollector(GenerationInfo? lastGenerationInfo, string[] dllPaths)
+        public DependencyCollector(GenerationInfo? lastGenerationInfo, string[] dllPaths, string outputPath)
         {
             LastGenerationInfo = lastGenerationInfo;
             DllPaths = dllPaths;
+            OutputPath = outputPath;
         }
 
         public GenerationInfo? LastGenerationInfo { get; set; }
         public string[] DllPaths { get; set; } 
+        public string OutputPath { get; set; }
 
         public DocumentInfo[] CollectDocuments(string path, ProjectId projectId)
         {
             List<DocumentInfo> documents = new();
-            var files = FastFileRetriever.GetFilesRecursive(path, "*", 0);
+            var files = FastFileRetriever.GetFilesRecursive(path, "*", [OutputPath]);
             foreach (var file in files)
             {
                 FileMetaRef fileMeta = file.metadata;
