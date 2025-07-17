@@ -13,5 +13,6 @@
 		  <Private>false</Private>
 		  <ExcludeAssets>runtime</ExcludeAssets>
 	  </ProjectReference>
+	  <ProjectReference Include="..\GodInject\GodInject.csproj" />
   </ItemGroup>
 </Project>

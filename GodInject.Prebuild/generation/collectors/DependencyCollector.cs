@@ -1,4 +1,5 @@
 ﻿using GodInject.Prebuild.API.data;
+using GodInject.Prebuild.API.generation;
 using GodInject.Prebuild.API.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
@@ -7,46 +8,33 @@ namespace GodInject.Prebuild.generation.collectors
 {
     public class DependencyCollector : IDependencyCollector
     {
-        public DependencyCollector(GenerationInfo? lastGenerationInfo, string[] dllPaths, string outputPath)
+        public DependencyCollector(GenerationInfo? lastGenerationInfo, string[] dllPaths, string outputPath, ICsFileRegistry registry)
         {
             LastGenerationInfo = lastGenerationInfo;
             DllPaths = dllPaths;
             OutputPath = outputPath;
+            DocumentInfoRegistry = registry;
         }
 
         public GenerationInfo? LastGenerationInfo { get; set; }
         public string[] DllPaths { get; set; } 
         public string OutputPath { get; set; }
+        public ICsFileRegistry DocumentInfoRegistry { get; set; }
 
-        public DocumentInfo[] CollectDocuments(string path, ProjectId projectId)
+        public void CollectDocument(string path, FileMetaRef metadata)
         {
-            List<DocumentInfo> documents = new();
-            var files = FastFileRetriever.GetFilesRecursive(path, "*", [OutputPath]);
-            foreach (var file in files)
+            if ((metadata.FileAttributes & (uint)FileAttributes.Directory) != 16)
             {
-                FileMetaRef fileMeta = file.metadata;
-                string filePath = file.path;
-                if ((fileMeta.FileAttributes & (uint)FileAttributes.Directory) != 16)
-                {
-                    if (!fileMeta.Name.EndsWith("cs"))
-                        continue;
+                if (!metadata.Name.EndsWith("cs"))
+                    return;
 
-                    if (LastGenerationInfo == null || 
-                       (LastGenerationInfo != null && LastGenerationInfo.LastRun < fileMeta.LastWriteTime))
-                    {
-                        DocumentInfo document = DocumentInfo.Create(
-                            DocumentId.CreateNewId(projectId),
-                            Path.GetFileNameWithoutExtension(filePath),
-                            null,
-                            SourceCodeKind.Script,
-                            TextLoader.From(TextAndVersion.Create(SourceText.From(File.ReadAllText(filePath)), VersionStamp.Create(), filePath)),
-                            filePath
-                        );
-                        documents.Add(document);
-                    }
+                if (LastGenerationInfo == null || 
+                    (LastGenerationInfo != null && LastGenerationInfo.LastRun < metadata.LastWriteTime))
+                {
+                    DocumentInfoRegistry.Add(path);
                 }
+                
             }
-            return documents.ToArray();
         }
 
         public PortableExecutableReference[] CollectExecReferences()

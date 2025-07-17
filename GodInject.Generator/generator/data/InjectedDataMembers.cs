@@ -1,19 +1,24 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using GodInject.Prebuild.API.generation;
+using Microsoft.CodeAnalysis;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace GodInject.Prebuild.injection_generator.data
 {
     public class InjectedDataMembers
     {
-        public InjectedDataMembers(INamedTypeSymbol classSymbol)
+        public InjectedDataMembers(INamedTypeSymbol classSymbol, IMissingSymbolsRegistry symbolsRegistry)
         {
+            MissingSymbolsRegistry = symbolsRegistry;
             InjectedProperties = GetInjectedProperties(classSymbol);
             InjectedFields = GetInjectedFields(classSymbol);
         }
-
+        
         public InjectedProperty[] InjectedProperties { get; set; }
         public InjectedField[] InjectedFields { get; set; }
+        public IMissingSymbolsRegistry MissingSymbolsRegistry { get; set; }
+
         public InjectedProperty[] GetInjectedProperties(INamedTypeSymbol classSymbol)
         {
             var properties = classSymbol.GetMembers()
@@ -28,6 +33,12 @@ namespace GodInject.Prebuild.injection_generator.data
             var injectedProperties = new List<InjectedProperty>();
             foreach (var property in properties)
             {
+                if(property.Type.TypeKind == TypeKind.Error)
+                {
+                    MissingSymbolsRegistry.AddMissingSymbol(property.Type.Name);
+                    continue;
+                }
+
                 var injectAttribute = property.GetAttributes().FirstOrDefault(attr =>
                 {
                     if (attr.AttributeClass == null) return false;
@@ -63,6 +74,12 @@ namespace GodInject.Prebuild.injection_generator.data
             var injectedFields = new List<InjectedField>();
             foreach (var field in fields)
             {
+                if (field.Type.TypeKind == TypeKind.Error)
+                {
+                    MissingSymbolsRegistry.AddMissingSymbol(field.Type.Name);
+                    continue;
+                }
+
                 var injectAttribute = field.GetAttributes().FirstOrDefault(attr => 
                 { 
                     if (attr.AttributeClass == null) return false; 

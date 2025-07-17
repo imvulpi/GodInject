@@ -5,6 +5,7 @@ using GodInject.Prebuild.injection_generator;
 using GodInject.Prebuild.injection_generator.data;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Diagnostics;
 
 namespace GodInject.Generator.injection_generator
 {
@@ -41,7 +42,8 @@ namespace GodInject.Generator.injection_generator
                 if (semanticModel.GetDeclaredSymbol(classSyntax) is not INamedTypeSymbol classSymbol)
                     continue;
 
-                InjectedDataMembers injectedDataMembers = new InjectedDataMembers(classSymbol);
+                InjectedDataMembers injectedDataMembers = new InjectedDataMembers(classSymbol, MissingSymbolsRegistry);
+
                 if (classSymbol.BaseType != null && classSymbol.BaseType.Locations.Length == 0)
                 {
                     string? baseType = classSymbol.BaseType.ToString();

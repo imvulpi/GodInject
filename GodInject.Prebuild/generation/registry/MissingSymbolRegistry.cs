@@ -2,7 +2,7 @@
 {
     internal class MissingSymbolRegistry : IInternalMissingSymbolsRegistry
     {
-        internal HashSet<string> MissingSymbols = new HashSet<string>();
+        internal HashSet<string> MissingSymbols = [];
         public void AddMissingSymbol(string symbol)
         {
             MissingSymbols.Add(symbol);

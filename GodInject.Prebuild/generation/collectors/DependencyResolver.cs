@@ -1,39 +1,68 @@
 ﻿using GodInject.Prebuild.API.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
+using System.Diagnostics;
 
 namespace GodInject.Prebuild.generation.collectors
 {
     public class DependencyResolver : IDependencyResolver
     {
+        public DependencyResolver(StructuresInfo? structuresInfo)
+        {
+            StructuresInfo = structuresInfo;
+        }
+
+        private StructuresInfo? StructuresInfo { get; set; }
         public DocumentInfo[] ResolveDocuments(string path, string[] missingSymbols, ProjectId projectId)
         {
             List<DocumentInfo> resolvedDocuments = new();
-            var files = FastFileRetriever.GetFilesRecursive(path, "*");
-            foreach ((string filePath, FileMetaRef fileMeta) in files)
+            if (StructuresInfo != null)
             {
-                if ((fileMeta.FileAttributes & (uint)FileAttributes.Directory) == (uint)FileAttributes.Directory)
-                    continue;
-
-                for (int o = 0; o < missingSymbols.Length; o++)
+                foreach (string missing in missingSymbols)
                 {
-                    string missingClass = missingSymbols[o];
-
-                    if (fileMeta.Name.Contains(missingClass, StringComparison.OrdinalIgnoreCase))
+                    if (StructuresInfo.NameAndStructureInfo.TryGetValue(missing, out var structureInfo))
                     {
                         DocumentInfo document = DocumentInfo.Create(
                             DocumentId.CreateNewId(projectId),
-                            Path.GetFileNameWithoutExtension(filePath),
+                            Path.GetFileNameWithoutExtension(structureInfo.FilePath),
                             null,
-                            SourceCodeKind.Script,
-                            TextLoader.From(TextAndVersion.Create(SourceText.From(File.ReadAllText(filePath)), VersionStamp.Create(), filePath)),
-                            filePath
+                            SourceCodeKind.Regular,
+                            TextLoader.From(TextAndVersion.Create(SourceText.From(File.ReadAllText(structureInfo.FilePath)), VersionStamp.Create(), structureInfo.FilePath)),
+                            structureInfo.FilePath
                         );
                         resolvedDocuments.Add(document);
                     }
-                }                
+                }
+                return resolvedDocuments.ToArray();
             }
-            return resolvedDocuments.ToArray();
+            else
+            {
+                var files = FastFileRetriever.GetFilesRecursive(path, "*");
+                foreach ((string filePath, FileMetaRef fileMeta) in files)
+                {
+                    if ((fileMeta.FileAttributes & (uint)FileAttributes.Directory) == (uint)FileAttributes.Directory)
+                        continue;
+
+                    for (int o = 0; o < missingSymbols.Length; o++)
+                    {
+                        string missingClass = missingSymbols[o];
+
+                        if (fileMeta.Name.Contains(missingClass, StringComparison.OrdinalIgnoreCase))
+                        {
+                            DocumentInfo document = DocumentInfo.Create(
+                                DocumentId.CreateNewId(projectId),
+                                Path.GetFileNameWithoutExtension(filePath),
+                                null,
+                                SourceCodeKind.Script,
+                                TextLoader.From(TextAndVersion.Create(SourceText.From(File.ReadAllText(filePath)), VersionStamp.Create(), filePath)),
+                                filePath
+                            );
+                            resolvedDocuments.Add(document);
+                        }
+                    }
+                }
+                return resolvedDocuments.ToArray();
+            }
         }
 
         public PortableExecutableReference[] ResolveReferences(string path, string[] missingReferences)

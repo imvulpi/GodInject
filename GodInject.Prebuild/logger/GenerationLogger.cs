@@ -12,7 +12,7 @@ namespace GodInject.Prebuild.logger
 
         public string LogsDirPath { get; set; }
         private readonly string logsFilePath;
-        public void LogError(string message, Exception exception = null)
+        public void LogError(string message, Exception? exception = null)
         {
             message = $"[ERROR][{DateTime.Now:yyyy.MM.dd HH:mm:ss:f}] {message}";
             if (exception != null)

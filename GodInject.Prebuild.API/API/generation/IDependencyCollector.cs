@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using GodInject.Prebuild.API.IO;
+using Microsoft.CodeAnalysis;
 
 namespace GodInject.Prebuild.generation.collectors
 {
@@ -8,7 +9,7 @@ namespace GodInject.Prebuild.generation.collectors
     public interface IDependencyCollector
     {
         // TODO: hooks for checking the documents/references (to pass/dismiss)
-        DocumentInfo[] CollectDocuments(string path, ProjectId projectId);
+        void CollectDocument(string path, FileMetaRef metadata);
         PortableExecutableReference[] CollectExecReferences();
     }
 }
