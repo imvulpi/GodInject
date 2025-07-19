@@ -1,6 +1,6 @@
 ﻿using MemoryPack;
 
-namespace GodInject.Prebuild.generation
+namespace GodInject.Prebuild.API.generation
 {
     /// <summary>
     /// A class for structures in a program for easy dependency resolution
@@ -17,7 +17,7 @@ namespace GodInject.Prebuild.generation
     {
         public StructureType Type { get; set; } = type;
         public string Namespace { get; set; } = @namespace;
-        public string FilePath { get; set; }
+        public string FilePath { get; set; } = "";
     }
 
     [MemoryPackable]

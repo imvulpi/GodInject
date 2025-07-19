@@ -1,6 +1,8 @@
-﻿namespace GodInject.Prebuild.generation.registry
+﻿using GodInject.Prebuild.API.generation;
+
+namespace GodInject.Prebuild.generation.registry
 {
-    internal class MissingSymbolRegistry : IInternalMissingSymbolsRegistry
+    internal class MissingSymbolRegistry : IMissingSymbolsRegistry
     {
         internal HashSet<string> MissingSymbols = [];
         public void AddMissingSymbol(string symbol)

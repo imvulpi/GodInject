@@ -4,9 +4,18 @@ namespace GodInject.Prebuild.logger
 {
     internal class SimpleLogger : ILogger
     {
-        public void LogError(string message, Exception exception = null)
+        public void LogError(string message, Exception? exception = null)
         {
-            string logMessage = $"[ERROR] {message}\nException:\n{exception}";
+            if(exception == null)
+            {
+                Console.Write($"[ERROR] {message}");
+                return;
+            }
+
+            string logMessage =
+                $"[ERROR] Exception of type {exception.GetType().FullName} occurred.\n" +
+                $"Message: {exception.Message}\n" +
+                $"StackTrace:\n{exception.StackTrace}";
             if (!logMessage.EndsWith('\n'))
             {
                 logMessage += "\n";

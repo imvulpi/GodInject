@@ -1,8 +1,7 @@
-﻿using DryIoc;
+﻿using GodInject.Prebuild.API.contexts;
 using GodInject.Prebuild.API.data;
 using GodInject.Prebuild.API.generation;
 using GodInject.Prebuild.API.logging;
-using GodInject.Prebuild.generation.collectors;
 using GodInject.Prebuild.generation.registry;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -13,31 +12,35 @@ namespace GodInject.Prebuild.generation
 {
     internal class MainRunner
     {
-        public MainRunner(IDependencyCollector collector, IDependencyResolver resolver, IDataCoupler<GenerationInfo> generationInfoCoupler, 
-            ExecutionPaths executionPaths, ILogger logger, IInternalCsFileRegistry registry, IDataCoupler<StructuresInfo> structureCoupler, StructuresInfo? structuresInfo)
+        public MainRunner(FrameworkContext frameworkContext)
         {
-            Collector = collector;
-            Resolver = resolver;
-            GenerationInfoCoupler = generationInfoCoupler;
-            ExecutionPaths = executionPaths;
-            Logger = logger;
-            Registry = registry;
-            StructureCoupler = structureCoupler;
-            StructuresInfo = structuresInfo;
+            DependencyCollector = frameworkContext.generationContext.GenerationTools.DependencyCollector;
+            DependencyResolver = frameworkContext.generationContext.GenerationTools.DependencyResolver;
+            GenerationInfoCoupler = frameworkContext.generationContext.GenerationDataContext.GenerationInfoCoupler;
+            ExecutionPaths = frameworkContext.runtimeContext.ExecutionPaths;
+            Logger = frameworkContext.runtimeContext.Logger;
+            CsFileRegistry = frameworkContext.generationContext.GenerationRegistry.CsFileRegistry;
+            StructureInfoCoupler = frameworkContext.generationContext.GenerationDataContext.StructuresInfoCoupler;
+            StructuresInfo = frameworkContext.generationContext.GenerationDataContext.StructuresInfo;
+            MissingSymbolsRegistry = frameworkContext.generationContext.GenerationRegistry.MissingSymbolsRegistry;
+            GeneratorRegistry = frameworkContext.generationContext.GenerationRegistry.GeneratorRegistry;
         }
 
-        public IDependencyCollector Collector { get; private set; }
-        public IDependencyResolver Resolver { get; private set; }
+        public IDependencyCollector DependencyCollector { get; private set; }
+        public IDependencyResolver DependencyResolver { get; private set; }
         public IDataCoupler<GenerationInfo> GenerationInfoCoupler { get; private set; }
         public ExecutionPaths ExecutionPaths { get; private set; }
         public ILogger Logger { get; private set; }
-        public IInternalCsFileRegistry Registry { get; set; }
-        public IDataCoupler<StructuresInfo> StructureCoupler { get; set; }
+        public ICsFileRegistry CsFileRegistry { get; set; }
+        public IGeneratorRegistry GeneratorRegistry { get; private set; }
+        public IMissingSymbolsRegistry MissingSymbolsRegistry { get; set; }
+        public IDataCoupler<StructuresInfo> StructureInfoCoupler { get; set; }
         public StructuresInfo? StructuresInfo { get; set; }
 
         private int currentFails = 0;
         private int maxFails = 2;
         public async void Run() {
+            Logger.LogInfo("Running");
             ProjectInfo projectInfo = CreateProject();
             AdhocWorkspace workspace = new AdhocWorkspace();
             Project project = workspace.AddProject(projectInfo);
@@ -46,9 +49,7 @@ namespace GodInject.Prebuild.generation
                 DocumentsCheckedCount = 0,
             };
             
-            IInternalGeneratorRegistry generatorRegistry = Dependencies.Container.Resolve<IInternalGeneratorRegistry>();
-            IInternalMissingSymbolsRegistry symbolsRegistry = Dependencies.Container.Resolve<IInternalMissingSymbolsRegistry>();
-            IList<IGenerator> generators = generatorRegistry.GetGenerators();
+            IList<IGenerator> generators = GeneratorRegistry.GetGenerators();
             StructuresInfo ??= new StructuresInfo();
 
             Logger.LogInfo($"Starting to process {generators.Count} Generators");
@@ -114,18 +115,14 @@ namespace GodInject.Prebuild.generation
                         (string name, StructureInfo info) = kvp;
                         info.FilePath = document.FilePath;
                         info.Namespace = namespaceName;
-                        if (!StructuresInfo.NameAndStructureInfo.ContainsKey(name))
-                        {
-                            StructuresInfo.NameAndStructureInfo.Add(name, info);
-                        }
-                        else
+                        if (!StructuresInfo.NameAndStructureInfo.TryAdd(name, info))
                         {
                             StructuresInfo.NameAndStructureInfo[name] = info;
                         }
                     }
                 }
 
-                ICollection<string> missingSymbols = symbolsRegistry.GetMissingSymbols();
+                ICollection<string> missingSymbols = MissingSymbolsRegistry.GetMissingSymbols();
                 if (missingSymbols.Count > 0)
                 {
                     if (currentFails == maxFails)
@@ -136,9 +133,8 @@ namespace GodInject.Prebuild.generation
                         break;
                     }
 
-                    Debugger.Launch();
                     currentFails++;
-                    var resolvedDocuments = Resolver.ResolveDocuments(ExecutionPaths.ProjectDirPath, missingSymbols.ToArray(), projectInfo.Id);
+                    var resolvedDocuments = DependencyResolver.ResolveDocuments(ExecutionPaths.ProjectDirPath, missingSymbols.ToArray(), projectInfo.Id);
                     Solution solution = workspace.CurrentSolution;
                     foreach (var document in resolvedDocuments)
                     {
@@ -149,7 +145,7 @@ namespace GodInject.Prebuild.generation
 
                     var updatedProject = workspace.CurrentSolution.GetProject(projectInfo.Id);
                     var compilation = await updatedProject.GetCompilationAsync();
-                    symbolsRegistry.GetMissingSymbols().Clear();
+                    MissingSymbolsRegistry.GetMissingSymbols().Clear();
                 }
                 else
                 {
@@ -161,7 +157,8 @@ namespace GodInject.Prebuild.generation
             EndGenerators(generators);
             currentGenerationInfo.LastRun = DateTime.Now.ToFileTimeUtc();
             await GenerationInfoCoupler.SaveAsync(currentGenerationInfo);
-            await StructureCoupler.SaveAsync(StructuresInfo);
+            await StructureInfoCoupler.SaveAsync(StructuresInfo);
+            Logger.LogInfo("Stopped");
         }
 
         private void StartGenerators(IList<IGenerator> generators)
@@ -185,8 +182,8 @@ namespace GodInject.Prebuild.generation
             string projectName = Path.GetFileNameWithoutExtension(ExecutionPaths.CsprojPath);
             ProjectId projectId = ProjectId.CreateNewId(projectName);
 
-            var referencesArray = Collector.CollectExecReferences();
-            var documents = Registry.GetDocuments();
+            var referencesArray = DependencyCollector.CollectExecReferences();
+            var documents = CsFileRegistry.GetPaths();
             DocumentInfo[] documentInfos = new DocumentInfo[documents.Length];
             for (int i = 0; i < documents.Length; i++)
             {

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GodInject.Prebuild.generation.registry
 {
-    internal class GeneratorRegistry : IInternalGeneratorRegistry
+    internal class GeneratorRegistry : IGeneratorRegistry
     {
         public GeneratorRegistry()
         {

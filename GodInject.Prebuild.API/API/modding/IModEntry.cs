@@ -1,4 +1,6 @@
-﻿namespace GodInject.Prebuild.API.modding
+﻿using GodInject.Prebuild.API.contexts;
+
+namespace GodInject.Prebuild.API.modding
 {
     /// <summary>
     /// The main entry of any mod.
@@ -10,6 +12,6 @@
         /// Function that will get called during mod loading,
         /// before any generation occurs.
         /// </summary>
-        public void Initialize(IModContext modContext);
+        public void Initialize(FrameworkContext modContext);
     }
 }

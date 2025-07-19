@@ -37,7 +37,7 @@ namespace GodInject.Prebuild.generation.collectors
             }
         }
 
-        public PortableExecutableReference[] CollectExecReferences()
+        public MetadataReference[] CollectExecReferences()
         {
             PortableExecutableReference[] references = new PortableExecutableReference[DllPaths.Length];
             for (int i = 0; i < DllPaths.Length; i++)

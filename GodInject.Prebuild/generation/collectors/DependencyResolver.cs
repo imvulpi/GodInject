@@ -1,13 +1,13 @@
-﻿using GodInject.Prebuild.API.IO;
+﻿using GodInject.Prebuild.API.generation;
+using GodInject.Prebuild.API.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using System.Diagnostics;
 
 namespace GodInject.Prebuild.generation.collectors
 {
     public class DependencyResolver : IDependencyResolver
     {
-        public DependencyResolver(StructuresInfo? structuresInfo)
+        public DependencyResolver(StructuresInfo structuresInfo)
         {
             StructuresInfo = structuresInfo;
         }

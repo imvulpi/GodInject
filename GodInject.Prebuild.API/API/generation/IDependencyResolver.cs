@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace GodInject.Prebuild.generation.collectors
+namespace GodInject.Prebuild.API.generation
 {
     /// <summary>
     /// Finds and resolves missing dependencies

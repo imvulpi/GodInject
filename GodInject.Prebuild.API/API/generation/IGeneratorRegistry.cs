@@ -6,6 +6,7 @@
     /// </summary>
     public interface IGeneratorRegistry
     {
+        public IList<IGenerator> GetGenerators();
         public void AddGenerator(IGenerator generator);
         public void RemoveGenerator(IGenerator generator);
     }

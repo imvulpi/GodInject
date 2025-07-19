@@ -1,21 +1,18 @@
-﻿using GodInject.Prebuild.API.modding;
+﻿using GodInject.Prebuild.API.contexts;
+using GodInject.Prebuild.API.modding;
 using System.Reflection;
 
 namespace GodInject.Prebuild.mods
 {
-    /// <summary>
-    /// Loads mods into the projects, looks for <see cref="IModEntry"/> and initializes it with the <see cref="IModContext"/>
-    /// The loading will give access to public accesible dependencies in the <see cref="Dependencies"/>,
-    /// You should only load after the important dependencies are registered that way they are accesible to the mods.
-    /// </summary>
     internal class ModsLoader
     {
-        public ModsLoader(string modsPath) {
+        public ModsLoader(string modsPath, FrameworkContext frameworkContext) {
             ModsPath = modsPath;
+            FrameworkContext = frameworkContext;
         }
         public string ModsPath { get; set; }
-        public ModContext ModContext = new(Dependencies.Container);
         private ModsCollector ModsCollector { get; set; } = new ModsCollector();
+        private FrameworkContext FrameworkContext { get; set; }
         public void LoadAll()
         {
             Assembly[] mods = ModsCollector.CollectMods(ModsPath);
@@ -39,7 +36,7 @@ namespace GodInject.Prebuild.mods
                     var modClass = Activator.CreateInstance(type);
                     if (modClass != null && modClass is IModEntry modEntry)
                     {
-                        modEntry.Initialize(ModContext);
+                        modEntry.Initialize(FrameworkContext);
                     }
                 }
             }

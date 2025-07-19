@@ -1,12 +1,12 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using GodInject.Prebuild.API.generation;
 
 namespace GodInject.Prebuild.generation.registry
 {
-    internal class DocumentInfoRegistry : IInternalCsFileRegistry
+    internal class CsFileRegistry : ICsFileRegistry
     {
         List<string> _documents = [];
 
-        public string[] GetDocuments()
+        public string[] GetPaths()
         {
             return _documents.ToArray();
         }

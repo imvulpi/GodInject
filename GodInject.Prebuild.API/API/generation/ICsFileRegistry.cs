@@ -2,7 +2,8 @@
 {
     public interface ICsFileRegistry
     {
-        public void Add(string document);
-        public void Remove(string document);
+        public string[] GetPaths();
+        public void Add(string path);
+        public void Remove(string path);
     }
 }
