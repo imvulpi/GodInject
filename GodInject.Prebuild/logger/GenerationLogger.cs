@@ -6,13 +6,13 @@ namespace GodInject.Prebuild.logger
     internal class GenerationLogger : ILogger
     {
         private const string LOGS_PREFIX = "logs~";
-        private const string LOGS_DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss";
+        private const string LOGS_DATE_FORMAT = "yyyy-MM-dd_HH-mm-ss-ffff";
 
         public uint MaxLogFiles { get; set; } = 3;
         public GenerationLogger(string logsDirPath)
         {
             LogsDirPath = logsDirPath ?? string.Empty;
-            
+
             long oldestDate = long.MaxValue;
             string oldestPath = string.Empty;
             int logCount = 0;
@@ -21,7 +21,7 @@ namespace GodInject.Prebuild.logger
                 if (metadata.Name.StartsWith(LOGS_PREFIX))
                 {
                     ReadOnlySpan<char> dateString = metadata.Name.AsSpan(LOGS_PREFIX.Length, LOGS_DATE_FORMAT.Length);
-                    if(DateTime.TryParseExact(dateString, LOGS_DATE_FORMAT, null, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out var result))
+                    if (DateTime.TryParseExact(dateString, LOGS_DATE_FORMAT, null, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out var result))
                     {
                         logCount++;
                         if (oldestDate > result.Ticks)
@@ -47,9 +47,9 @@ namespace GodInject.Prebuild.logger
 
         public string LogsDirPath { get; set; }
         private readonly string logsFilePath;
-        public void LogError(string message, Exception? exception = null)
+        public async Task LogError(string message, Exception? exception = null)
         {
-            message = $"[ERROR][{DateTime.Now:yyyy.MM.dd HH:mm:ss:f}] {message}";
+            message = $"[ERROR][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
             if (exception != null)
             {
                 message = $"{message} Exception of type {exception.GetType().FullName} occurred.\n" +
@@ -59,26 +59,34 @@ namespace GodInject.Prebuild.logger
 
             if (!message.EndsWith('\n'))
                 message += "\n";
-            
-            File.AppendAllText(logsFilePath, message);
+
+            await TryLogging(logsFilePath, message);
         }
 
-        public void LogWarning(string message)
+        public async Task LogWarning(string message)
         {
-            message = $"[WARNING][{DateTime.Now:yyyy.MM.dd HH:mm:ss:f}] {message}";
+            message = $"[WARNING][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
             if (!message.EndsWith('\n'))
                 message += "\n";
-            
-            File.AppendAllText(logsFilePath, message);
+
+            await TryLogging(logsFilePath, message);
         }
 
-        public void LogInfo(string message)
+        public async Task LogInfo(string message)
         {
-            message = $"[INFO][{DateTime.Now:yyyy.MM.dd HH:mm:ss:f}] {message}";
+            message = $"[INFO][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
             if (!message.EndsWith('\n'))
                 message += "\n";
-            
-            File.AppendAllText(logsFilePath, message);
+
+            await TryLogging(logsFilePath, message);
+        }
+
+        private async Task TryLogging(string path, string message)
+        {
+            await using var _ = await FileLockManager.WaitAsync(path);
+            using var stream = new FileStream(logsFilePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
+            using var writer = new StreamWriter(stream);
+            await writer.WriteAsync(message);
         }
     }
 }

@@ -5,14 +5,9 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GodInject.Prebuild.generation.collectors
 {
-    public class DependencyResolver : IDependencyResolver
+    public class DependencyResolver(StructuresInfo structuresInfo) : IDependencyResolver
     {
-        public DependencyResolver(StructuresInfo structuresInfo)
-        {
-            StructuresInfo = structuresInfo;
-        }
-
-        private StructuresInfo? StructuresInfo { get; set; }
+        private StructuresInfo? StructuresInfo { get; set; } = structuresInfo;
         public DocumentInfo[] ResolveDocuments(string path, string[] missingSymbols, ProjectId projectId)
         {
             List<DocumentInfo> resolvedDocuments = new();

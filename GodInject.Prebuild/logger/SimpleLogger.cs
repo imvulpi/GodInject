@@ -4,12 +4,12 @@ namespace GodInject.Prebuild.logger
 {
     internal class SimpleLogger : ILogger
     {
-        public void LogError(string message, Exception? exception = null)
+        public Task LogError(string message, Exception? exception = null)
         {
-            if(exception == null)
+            if (exception == null)
             {
                 Console.Write($"[ERROR] {message}");
-                return;
+                return Task.CompletedTask;
             }
 
             string logMessage =
@@ -21,9 +21,10 @@ namespace GodInject.Prebuild.logger
                 logMessage += "\n";
             }
             Console.Write(logMessage);
+            return Task.CompletedTask;
         }
 
-        public void LogInfo(string message)
+        public Task LogInfo(string message)
         {
             message = $"[INFO] {message}";
             if (!message.EndsWith('\n'))
@@ -31,9 +32,10 @@ namespace GodInject.Prebuild.logger
                 message += "\n";
             }
             Console.Write(message);
+            return Task.CompletedTask;
         }
 
-        public void LogWarning(string message)
+        public Task LogWarning(string message)
         {
             message = $"[WARNING] {message}";
             if (!message.EndsWith('\n'))
@@ -41,6 +43,7 @@ namespace GodInject.Prebuild.logger
                 message += "\n";
             }
             Console.Write(message);
+            return Task.CompletedTask;
         }
     }
 }

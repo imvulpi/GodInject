@@ -4,15 +4,11 @@ using System.Reflection;
 
 namespace GodInject.Prebuild.mods
 {
-    internal class ModsLoader
+    internal class ModsLoader(string modsPath, FrameworkContext frameworkContext)
     {
-        public ModsLoader(string modsPath, FrameworkContext frameworkContext) {
-            ModsPath = modsPath;
-            FrameworkContext = frameworkContext;
-        }
-        public string ModsPath { get; set; }
+        public string ModsPath { get; set; } = modsPath;
         private ModsCollector ModsCollector { get; set; } = new ModsCollector();
-        private FrameworkContext FrameworkContext { get; set; }
+
         public void LoadAll()
         {
             Assembly[] mods = ModsCollector.CollectMods(ModsPath);
@@ -36,7 +32,7 @@ namespace GodInject.Prebuild.mods
                     var modClass = Activator.CreateInstance(type);
                     if (modClass != null && modClass is IModEntry modEntry)
                     {
-                        modEntry.Initialize(FrameworkContext);
+                        modEntry.Initialize(frameworkContext);
                     }
                 }
             }

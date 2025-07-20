@@ -3,14 +3,9 @@ using GodInject.Prebuild.constants;
 
 namespace GodInject.Prebuild.validation
 {
-    public class ArgumentValidator : IArgumentValidator
+    public class ArgumentValidator(ILogger logger) : IArgumentValidator
     {
-        public ArgumentValidator(ILogger logger)
-        {
-            _logger = logger;
-        }
-
-        private ILogger _logger;
+        private ILogger _logger = logger;
         public bool Validate(string[] args)
         {
             _logger.LogInfo("Checking validity of passed arguments...");

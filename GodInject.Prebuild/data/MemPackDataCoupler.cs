@@ -3,16 +3,10 @@ using MemoryPack;
 
 namespace GodInject.Prebuild.data
 {
-    public class MemPackDataCoupler<T> : IDataCoupler<T> where T : class, new()
+    public class MemPackDataCoupler<T>(string filePath, MemoryPackSerializerOptions? memPackOptions = null) : IDataCoupler<T> where T : class, new()
     {
-        private readonly string _filePath;
-        private readonly MemoryPackSerializerOptions? _memPackOptions = null;
-
-        public MemPackDataCoupler(string filePath, MemoryPackSerializerOptions? memPackOptions = null)
-        {
-            _filePath = filePath;
-            _memPackOptions = memPackOptions;
-        }
+        private readonly string _filePath = filePath;
+        private readonly MemoryPackSerializerOptions? _memPackOptions = memPackOptions;
 
         public Task DeleteAsync()
         {
@@ -29,6 +23,7 @@ namespace GodInject.Prebuild.data
 
         public async Task<T?> ReadAsync()
         {
+            await using var _ = await FileLockManager.WaitAsync(_filePath);
             if (File.Exists(_filePath))
             {
                 using FileStream fileStream = new(_filePath, FileMode.Open, FileAccess.ReadWrite);
@@ -42,6 +37,7 @@ namespace GodInject.Prebuild.data
 
         public async Task SaveAsync(T data)
         {
+            await using var _ = await FileLockManager.WaitAsync(_filePath);
             byte[] serializedData = MemoryPackSerializer.Serialize<T>(data, _memPackOptions);
             await File.WriteAllBytesAsync(_filePath, serializedData);
         }

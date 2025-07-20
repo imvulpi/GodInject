@@ -1,25 +1,16 @@
-﻿using GodInject.Prebuild.API.data;
+﻿using GodInject.Prebuild.API.contexts;
+using GodInject.Prebuild.API.data;
 using GodInject.Prebuild.API.generation;
 using GodInject.Prebuild.API.IO;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Text;
 
 namespace GodInject.Prebuild.generation.collectors
 {
-    public class DependencyCollector : IDependencyCollector
+    public class DependencyCollector(GenerationRegistries generationRegistries, GenerationDataContext generationData) : IDependencyCollector
     {
-        public DependencyCollector(GenerationInfo? lastGenerationInfo, string[] dllPaths, string outputPath, ICsFileRegistry registry)
-        {
-            LastGenerationInfo = lastGenerationInfo;
-            DllPaths = dllPaths;
-            OutputPath = outputPath;
-            DocumentInfoRegistry = registry;
-        }
-
-        public GenerationInfo? LastGenerationInfo { get; set; }
-        public string[] DllPaths { get; set; } 
-        public string OutputPath { get; set; }
-        public ICsFileRegistry DocumentInfoRegistry { get; set; }
+        public GenerationRegistries GenerationRegistries { get; private set; } = generationRegistries;
+        public GenerationDataContext GenerationData { get; private set; } = generationData;
+        public GenerationInfo? LastGenerationInfo => GenerationData.GenerationInfo;
 
         public void CollectDocument(string path, FileMetaRef metadata)
         {
@@ -28,21 +19,20 @@ namespace GodInject.Prebuild.generation.collectors
                 if (!metadata.Name.EndsWith("cs"))
                     return;
 
-                if (LastGenerationInfo == null || 
+                if (LastGenerationInfo == null ||
                     (LastGenerationInfo != null && LastGenerationInfo.LastRun < metadata.LastWriteTime))
                 {
-                    DocumentInfoRegistry.Add(path);
+                    GenerationRegistries.CsFileRegistry.Add(path);
                 }
-                
             }
         }
 
         public MetadataReference[] CollectExecReferences()
         {
-            PortableExecutableReference[] references = new PortableExecutableReference[DllPaths.Length];
-            for (int i = 0; i < DllPaths.Length; i++)
+            PortableExecutableReference[] references = new PortableExecutableReference[GenerationData.AbsoluteDllPaths.Length];
+            for (int i = 0; i < GenerationData.AbsoluteDllPaths.Length; i++)
             {
-                references[i] = MetadataReference.CreateFromFile(DllPaths[i]);
+                references[i] = MetadataReference.CreateFromFile(GenerationData.AbsoluteDllPaths[i]);
             }
 
             return references;

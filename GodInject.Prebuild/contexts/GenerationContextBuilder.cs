@@ -11,14 +11,15 @@ namespace GodInject.Prebuild.contexts
         public async Task<GenerationContext> BuildAsync(RuntimeContext runtimeContext)
         {
             GenerationDataContext generationDataContext = await new GenerationDataContextBuilder(logger).BuildAsync(runtimeContext.ExecutionPaths, runtimeContext.ExecutionSettings);
-            StructureInfoValidator infoValidator = new(generationDataContext.StructuresInfo, logger);
+            GenerationRegistries generationRegistries = new GenerationRegistries(new CsFileRegistry(), new GeneratorRegistry(), new MissingSymbolRegistry());
+
+            DependencyCollector dependencyCollector = new(generationRegistries, generationDataContext);
             DependencyResolver dependencyResolver = new(generationDataContext.StructuresInfo);
-            CsFileRegistry csFileRegistry = new();
-            DependencyCollector dependencyCollector = new(generationDataContext.GenerationInfo, generationDataContext.AbsoluteDllPaths, runtimeContext.ExecutionPaths.GenerationOutputDirPath, csFileRegistry);
+            StructureInfoValidator infoValidator = new(generationDataContext.StructuresInfo, logger);
 
             return new GenerationContext(
                 generationDataContext,
-                new GenerationRegistries(csFileRegistry, new GeneratorRegistry(), new MissingSymbolRegistry()),
+                generationRegistries,
                 new GenerationTools(dependencyCollector, dependencyResolver, infoValidator)
             );
         }

@@ -3,37 +3,33 @@ using GodInject.Prebuild.API.IO;
 using GodInject.Prebuild.API.logging;
 namespace GodInject.Prebuild.generation
 {
-    public class StructureInfoValidator : IStructureInfoValidator
+    public class StructureInfoValidator(StructuresInfo structuresInfo, ILogger logger) : IStructureInfoValidator
     {
-        public StructureInfoValidator(StructuresInfo structuresInfo, ILogger logger)
-        {
-            _logger = logger;
-            StructuresInfo = structuresInfo;
-        }
-
         public List<KeyValuePair<string, FileSignature>> MissingFiles = [];
-        public StructuresInfo StructuresInfo { get; set; }
-        private ILogger _logger;
+        public StructuresInfo StructuresInfo { get; set; } = structuresInfo;
+        private ILogger _logger = logger;
 
         public void Switch(StructuresInfo structureInfo)
         {
             MissingFiles.Clear();
             StructuresInfo = structureInfo;
         }
-        
-        public void ProcessStructureInfo() {
+
+        public void ProcessStructureInfo(IEnumerable<(string path, FileMetaRef metadata)> files)
+        {
             _logger.LogInfo("Starting validation");
-            if (StructuresInfo == null) return;
-            foreach (var kvp in StructuresInfo.FilePaths)
+            Dictionary<string, FileSignature> missingFilesCopy = StructuresInfo.FilePaths.ToDictionary();
+
+            foreach (var (path, _) in files)
             {
-                (string path, FileSignature _) = kvp;
-                if (!File.Exists(path))
+                if (missingFilesCopy.ContainsKey(path))
                 {
-                    MissingFiles.Add(kvp);
-                    StructuresInfo.FilePaths.Remove(path);
+                    missingFilesCopy.Remove(path);
                 }
             }
-            _logger.LogInfo("Ended validation");
+
+            MissingFiles = missingFilesCopy.ToList();
+            _logger.LogInfo($"Ended validation with {MissingFiles.Count} missing files");
         }
 
         public void ValidateFile(string path, FileMetaRef fileMetadata)

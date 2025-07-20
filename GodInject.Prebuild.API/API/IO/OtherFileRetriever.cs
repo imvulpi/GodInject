@@ -15,6 +15,7 @@ namespace GodInject.Prebuild.API.IO
             RangeList<FileInfo> infos = new RangeList<FileInfo>(paths.Length);
             for (int i = 0; i < paths.Length; i++)
             {
+                if (i >= infos.Count) continue;
                 infos[i] = new(paths[i]);
             }
             return new FileMetaRef(infos);

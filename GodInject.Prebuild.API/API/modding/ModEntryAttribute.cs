@@ -7,9 +7,9 @@
     public class ModEntryAttribute : Attribute
     {
         public string Name { get; }
-        public string Version { get; }
-        public string Author { get; }
-        public string Description { get; }
+        public string Version { get; } = "";
+        public string Author { get; } = "";
+        public string Description { get; } = "";
 
         public ModEntryAttribute(string name)
         {

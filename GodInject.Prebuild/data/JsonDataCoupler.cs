@@ -27,6 +27,7 @@ namespace GodInject.Prebuild.data
             if (!File.Exists(_filePath))
                 return null;
 
+            await using var _ = await FileLockManager.WaitAsync(_filePath);
             using var stream = File.OpenRead(_filePath);
             var data = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions);
             return data;
@@ -34,8 +35,9 @@ namespace GodInject.Prebuild.data
 
         public async Task SaveAsync(T data)
         {
-            if (data == null) throw new ArgumentNullException(nameof(data));
+            ArgumentNullException.ThrowIfNull(data);
 
+            await using var _ = await FileLockManager.WaitAsync(_filePath);
             using var stream = File.Create(_filePath);
             await JsonSerializer.SerializeAsync(stream, data, _jsonOptions);
         }

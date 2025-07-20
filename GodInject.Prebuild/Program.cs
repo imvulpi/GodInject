@@ -1,4 +1,5 @@
 ﻿using GodInject.Prebuild.API.contexts;
+using GodInject.Prebuild.API.IO;
 using GodInject.Prebuild.API.logging;
 using GodInject.Prebuild.constants;
 using GodInject.Prebuild.contexts;
@@ -26,19 +27,23 @@ namespace GodInject.Prebuild
                 logger = runtimeContext.Logger;
                 _globalLogger = runtimeContext.Logger;
                 GenerationContext generationContext = await new GenerationContextBuilder(logger).BuildAsync(runtimeContext);
-                ProjectFileRecursor projectFileRecursor = new(
-                    generationContext.GenerationTools.DependencyCollector.CollectDocument,
-                    generationContext.GenerationTools.StructureInfoValidator.ValidateFile
-                );
                 FrameworkContext frameworkContext = new(runtimeContext, generationContext);
                 ModsLoader modsLoader = new(runtimeContext.ExecutionPaths.ModsDirPath, frameworkContext);
                 MainRunner mainRunner = new(frameworkContext);
 
                 modsLoader.LoadAll();
-                generationContext.GenerationTools.StructureInfoValidator.ProcessStructureInfo();
-                projectFileRecursor.RecurseFiles(runtimeContext.ExecutionPaths.ProjectDirPath, [runtimeContext.ExecutionPaths.GenerationOutputDirPath]);
-                mainRunner.Run();
-            }catch(Exception ex)
+                var files = FastFileRetriever.GetFilesRecursive(frameworkContext.runtimeContext.ExecutionPaths.ProjectDirPath, "*", [frameworkContext.runtimeContext.ExecutionPaths.GenerationOutputDirPath]);
+
+                frameworkContext.generationContext.GenerationTools.StructureInfoValidator.ProcessStructureInfo(files);
+                foreach (var (path, metadata) in files)
+                {
+                    frameworkContext.generationContext.GenerationTools.DependencyCollector.CollectDocument(path, metadata);
+                    frameworkContext.generationContext.GenerationTools.StructureInfoValidator.ValidateFile(path, metadata);
+                }
+
+                await mainRunner.Run();
+            }
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 _globalLogger?.LogError($"[FATAL] ");

@@ -11,7 +11,7 @@ namespace GodInject.Prebuild.API.generation
     public interface IGenerator
     {
         public void Start();
-        public void Generate(Document document);
+        public void Generate(Document document, SyntaxNode? syntaxRoot, SemanticModel? semanticModel);
         public void End();
     }
 }

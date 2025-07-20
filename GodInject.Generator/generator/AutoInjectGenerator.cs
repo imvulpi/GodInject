@@ -5,7 +5,6 @@ using GodInject.Prebuild.injection_generator;
 using GodInject.Prebuild.injection_generator.data;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System.Diagnostics;
 
 namespace GodInject.Generator.injection_generator
 {
@@ -29,10 +28,8 @@ namespace GodInject.Generator.injection_generator
             Logger?.LogInfo($"[{ModEntry.ModuleName}] Generator Starts");
         }
 
-        public async void Generate(Document document)
+        public async void Generate(Document document, SyntaxNode? syntaxRoot, SemanticModel? semanticModel)
         {
-            var syntaxRoot = await document.GetSyntaxRootAsync();
-            var semanticModel = await document.GetSemanticModelAsync();
             if (syntaxRoot == null || semanticModel == null)
                 return;
 
@@ -49,7 +46,7 @@ namespace GodInject.Generator.injection_generator
                     string? baseType = classSymbol.BaseType.ToString();
                     if (baseType == "object")
                     {
-                        CreateClassFile(classSymbol, injectedDataMembers);
+                        await CreateClassFile(classSymbol, injectedDataMembers);
                         continue;
                     }
                     if(baseType != null)
@@ -57,13 +54,13 @@ namespace GodInject.Generator.injection_generator
                 }
                 else
                 {
-                    CreateClassFile(classSymbol, injectedDataMembers);
+                    await CreateClassFile(classSymbol, injectedDataMembers);
                 }
             }
             return;
         }
 
-        private void CreateClassFile(INamedTypeSymbol classSymbol, InjectedDataMembers injectedDataMembers)
+        private async Task CreateClassFile(INamedTypeSymbol classSymbol, InjectedDataMembers injectedDataMembers)
         {
             if (injectedDataMembers.InjectedFields.Length <= 0 && injectedDataMembers.InjectedProperties.Length <= 0)
                 return;
@@ -73,7 +70,7 @@ namespace GodInject.Generator.injection_generator
 
             if (newSource != null)
             {
-                File.WriteAllText(Path.Join(ExecutionPaths.GenerationOutputDirPath, $"{className}.g.cs"), newSource);
+                await File.WriteAllTextAsync(Path.Join(ExecutionPaths.GenerationOutputDirPath, $"{className}.g.cs"), newSource);
             }
         }
 

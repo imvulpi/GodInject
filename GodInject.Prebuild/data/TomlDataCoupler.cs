@@ -28,14 +28,15 @@ namespace GodInject.Prebuild.data
             if (!File.Exists(_filePath))
                 return null;
 
+            await using var _ = await FileLockManager.WaitAsync(_filePath);
             string tomlString = await File.ReadAllTextAsync(_filePath);
             return TomletMain.To<T>(tomlString, _tomlOptions);
         }
 
         public async Task SaveAsync(T data)
         {
-            if (data == null) throw new ArgumentNullException(nameof(data));
-
+            ArgumentNullException.ThrowIfNull(data);
+            await using var _ = await FileLockManager.WaitAsync(_filePath);
             string tomlString = TomletMain.TomlStringFrom(data, _tomlOptions);
             await File.WriteAllTextAsync(_filePath, tomlString);
         }

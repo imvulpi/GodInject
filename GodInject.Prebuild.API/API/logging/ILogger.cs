@@ -5,8 +5,8 @@
     /// </summary>
     public interface ILogger
     {
-        public void LogError(string message, Exception? exception = null);
-        public void LogWarning(string message);
-        public void LogInfo(string message);
+        public Task LogError(string message, Exception? exception = null);
+        public Task LogWarning(string message);
+        public Task LogInfo(string message);
     }
 }

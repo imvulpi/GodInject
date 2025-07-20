@@ -9,14 +9,14 @@ public class RuntimeContextBuilder(ILogger logger)
 {
     public async Task<RuntimeContext> BuildAsync(string[] args)
     {
-        logger.LogInfo("Starts collection of execution settings");
+        await logger.LogInfo("Starts collection of execution settings");
 
         var coupler = new TomlDataCoupler<ExecutionSettings>(GetExecutionSettingsPath(args));
         var settings = await GetExecutionSettings(coupler);
         var paths = new ExecutionPaths(args[0], settings);
         logger = SwitchLogger(logger, paths.GeneratorFilesDirPath);
 
-        logger.LogInfo("Ends successful collection of base settings");
+        await logger.LogInfo("Ends successful collection of base settings");
 
         return new RuntimeContext(coupler, settings, paths, logger);
     }
@@ -31,11 +31,11 @@ public class RuntimeContextBuilder(ILogger logger)
 
     private string GetExecutionSettingsPath(string[] args)
     {
-        string path = "";
         string projectCsprojPath = args[0];
         string? projectDirPath = Path.GetDirectoryName(projectCsprojPath);
 
         bool argumentsContainExecSettingsPath = args.Length == 2;
+        string path;
         if (argumentsContainExecSettingsPath)
         {
             string execSettingsPath = args[1];
@@ -56,8 +56,8 @@ public class RuntimeContextBuilder(ILogger logger)
         }
         else
         {
-            path = Path.Join(projectDirPath, 
-                ExecutionSettings.GENERATOR_FILES_DEFAULT, 
+            path = Path.Join(projectDirPath,
+                ExecutionSettings.GENERATOR_FILES_DEFAULT,
                 Constants.EXECUTION_SETTINGS_FILENAME);
         }
 

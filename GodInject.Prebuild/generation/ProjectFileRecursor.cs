@@ -5,14 +5,9 @@ namespace GodInject.Prebuild.generation
     /// <summary>
     /// Recurses around all project files to perform multiple actions at the same time without needing multiple calls
     /// </summary>
-    public class ProjectFileRecursor
+    public class ProjectFileRecursor(params Action<string, FileMetaRef>[] fileActions)
     {
-        public ProjectFileRecursor(params Action<string, FileMetaRef>[] fileActions)
-        {
-            FileActions = fileActions;
-        }
-
-        public Action<string, FileMetaRef>[] FileActions { get; set; }
+        public Action<string, FileMetaRef>[] FileActions { get; set; } = fileActions;
 
         public void RecurseFiles(string path, string[] ignoreDirs)
         {
