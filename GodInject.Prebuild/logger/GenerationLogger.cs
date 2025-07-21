@@ -12,36 +12,7 @@ namespace GodInject.Prebuild.logger
         public GenerationLogger(string logsDirPath)
         {
             LogsDirPath = logsDirPath ?? string.Empty;
-
-            long oldestDate = long.MaxValue;
-            string oldestPath = string.Empty;
-            int logCount = 0;
-            foreach (var metadata in FastFileRetriever.GetFiles(LogsDirPath, "*"))
-            {
-                if (metadata.Name.StartsWith(LOGS_PREFIX))
-                {
-                    ReadOnlySpan<char> dateString = metadata.Name.AsSpan(LOGS_PREFIX.Length, LOGS_DATE_FORMAT.Length);
-                    if (DateTime.TryParseExact(dateString, LOGS_DATE_FORMAT, null, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out var result))
-                    {
-                        logCount++;
-                        if (oldestDate > result.Ticks)
-                        {
-                            oldestDate = result.Ticks;
-                            oldestPath = Path.Combine(logsDirPath, metadata.Name);
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("[ERROR] Could not parse logs!");
-                    }
-                }
-            }
-
-            if (logCount >= MaxLogFiles)
-            {
-                File.Delete(oldestPath);
-            }
-
+            DeleteOlderLogs(LogsDirPath);
             logsFilePath = Path.Join(logsDirPath, $"{LOGS_PREFIX}{DateTime.Now.ToString(LOGS_DATE_FORMAT)}.txt");
         }
 
@@ -56,9 +27,7 @@ namespace GodInject.Prebuild.logger
                           $"Message: {exception.Message}\n" +
                           $"StackTrace:\n{exception.StackTrace}";
             }
-
-            if (!message.EndsWith('\n'))
-                message += "\n";
+            CheckEndLine(message);
 
             await TryLogging(logsFilePath, message);
         }
@@ -66,8 +35,7 @@ namespace GodInject.Prebuild.logger
         public async Task LogWarning(string message)
         {
             message = $"[WARNING][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
-            if (!message.EndsWith('\n'))
-                message += "\n";
+            CheckEndLine(message);
 
             await TryLogging(logsFilePath, message);
         }
@@ -75,10 +43,16 @@ namespace GodInject.Prebuild.logger
         public async Task LogInfo(string message)
         {
             message = $"[INFO][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
-            if (!message.EndsWith('\n'))
-                message += "\n";
+            CheckEndLine(message);
 
             await TryLogging(logsFilePath, message);
+        }
+
+        private string CheckEndLine(string message)
+        {
+            if (!message.EndsWith('\n'))
+                message += "\n";
+            return message;
         }
 
         private async Task TryLogging(string path, string message)
@@ -87,6 +61,38 @@ namespace GodInject.Prebuild.logger
             using var stream = new FileStream(logsFilePath, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
             using var writer = new StreamWriter(stream);
             await writer.WriteAsync(message);
+        }
+
+        private void DeleteOlderLogs(string path)
+        {
+            long oldestDate = long.MaxValue;
+            string oldestPath = string.Empty;
+            int logCount = 0;
+            foreach (var metadata in FastFileRetriever.GetFiles(path, "*"))
+            {
+                if (metadata.Name.StartsWith(LOGS_PREFIX))
+                {
+                    ReadOnlySpan<char> dateString = metadata.Name.AsSpan(LOGS_PREFIX.Length, LOGS_DATE_FORMAT.Length);
+                    if (DateTime.TryParseExact(dateString, LOGS_DATE_FORMAT, null, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out var result))
+                    {
+                        logCount++;
+                        if (oldestDate > result.Ticks)
+                        {
+                            oldestDate = result.Ticks;
+                            oldestPath = Path.Join(path, metadata.Name);
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("[ERROR] Could not parse logs!");
+                    }
+                }
+            }
+
+            if (logCount >= MaxLogFiles)
+            {
+                File.Delete(oldestPath);
+            }
         }
     }
 }

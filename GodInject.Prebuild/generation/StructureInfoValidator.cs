@@ -1,13 +1,13 @@
 ﻿using GodInject.Prebuild.API.generation;
 using GodInject.Prebuild.API.IO;
 using GodInject.Prebuild.API.logging;
+using System.Runtime.CompilerServices;
 namespace GodInject.Prebuild.generation
 {
     public class StructureInfoValidator(StructuresInfo structuresInfo, ILogger logger) : IStructureInfoValidator
     {
         public List<KeyValuePair<string, FileSignature>> MissingFiles = [];
         public StructuresInfo StructuresInfo { get; set; } = structuresInfo;
-        private ILogger _logger = logger;
 
         public void Switch(StructuresInfo structureInfo)
         {
@@ -17,47 +17,56 @@ namespace GodInject.Prebuild.generation
 
         public void ProcessStructureInfo(IEnumerable<(string path, FileMetaRef metadata)> files)
         {
-            _logger.LogInfo("Starting validation");
+            logger.LogInfo("Starting validation");
             Dictionary<string, FileSignature> missingFilesCopy = StructuresInfo.FilePaths.ToDictionary();
 
             foreach (var (path, _) in files)
             {
-                if (missingFilesCopy.ContainsKey(path))
-                {
-                    missingFilesCopy.Remove(path);
-                }
+                missingFilesCopy.Remove(path);
             }
 
             MissingFiles = missingFilesCopy.ToList();
-            _logger.LogInfo($"Ended validation with {MissingFiles.Count} missing files");
+            logger.LogInfo($"Ended validation with {MissingFiles.Count} missing files");
         }
 
         public void ValidateFile(string path, FileMetaRef fileMetadata)
         {
             if(StructuresInfo == null) return;
-            if (Path.GetExtension(path) == ".cs")
+            if (Path.GetExtension(path) != ".cs") return;
+
+            AddIfNotInStructure(path, fileMetadata);
+            foreach ((string missingPath, FileSignature fileSignature) in MissingFiles)
             {
-                if (!StructuresInfo.FilePaths.ContainsKey(path))
+                bool filesSignaturesMatch = fileMetadata.RealSize == fileSignature.SizeInBytes && fileMetadata.LastWriteTime == fileSignature.LastWriteTime;
+
+                if (filesSignaturesMatch)
                 {
-                    StructuresInfo.FilePaths.Add(path, new FileSignature() { LastWriteTime = fileMetadata.LastWriteTime, SizeInBytes = fileMetadata.RealSize });
-                }
-                foreach (var pathAndSignature in MissingFiles)
-                {
-                    (string missingPath, FileSignature fileSignature) = pathAndSignature;
-                    if (fileMetadata.RealSize == fileSignature.SizeInBytes && fileMetadata.LastWriteTime == fileSignature.LastWriteTime)
+                    foreach (var nameAndStructure in StructuresInfo.NameAndStructureInfo)
                     {
-                        foreach (var nameAndStructure in StructuresInfo.NameAndStructureInfo)
+                        (string structuresName, StructureInfo structuresInfo) = nameAndStructure;
+                        if (structuresInfo.FilePath == missingPath)
                         {
-                            (string nameStructure, StructureInfo structureInfo) = nameAndStructure;
-                            if (structureInfo.FilePath == missingPath)
-                            {
-                                structureInfo.FilePath = path;
-                                StructuresInfo.NameAndStructureInfo[nameStructure] = structureInfo;
-                            }
+                            structuresInfo.FilePath = path;
+                            StructuresInfo.NameAndStructureInfo[structuresName] = structuresInfo;
                         }
-                        break;
                     }
+                    break;
                 }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void AddIfNotInStructure(string path, FileMetaRef fileMetadata)
+        {
+            if (!StructuresInfo.FilePaths.ContainsKey(path))
+            {
+                FileSignature fileSignature = new()
+                {
+                    LastWriteTime = fileMetadata.LastWriteTime,
+                    SizeInBytes = fileMetadata.RealSize
+                };
+
+                StructuresInfo.FilePaths.Add(path, fileSignature);
             }
         }
     }

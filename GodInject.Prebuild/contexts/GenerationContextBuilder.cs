@@ -14,7 +14,7 @@ namespace GodInject.Prebuild.contexts
             GenerationRegistries generationRegistries = new GenerationRegistries(new CsFileRegistry(), new GeneratorRegistry(), new MissingSymbolRegistry());
 
             DependencyCollector dependencyCollector = new(generationRegistries, generationDataContext);
-            DependencyResolver dependencyResolver = new(generationDataContext.StructuresInfo);
+            DependencyResolver dependencyResolver = new(generationDataContext);
             StructureInfoValidator infoValidator = new(generationDataContext.StructuresInfo, logger);
 
             return new GenerationContext(

@@ -4,11 +4,11 @@
     {
         public FrameworkContext(RuntimeContext runtimeContext, GenerationContext generationContext)
         {
-            this.runtimeContext = runtimeContext;
-            this.generationContext = generationContext;
+            this.Runtime = runtimeContext;
+            this.Generation = generationContext;
         }
 
-        public RuntimeContext runtimeContext { get; set; }
-        public GenerationContext generationContext { get; set; }
+        public RuntimeContext Runtime { get; set; }
+        public GenerationContext Generation { get; set; }
     }
 }

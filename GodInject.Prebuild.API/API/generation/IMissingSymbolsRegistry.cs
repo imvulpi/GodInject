@@ -8,7 +8,7 @@
     public interface IMissingSymbolsRegistry
     {
         public ICollection<string> GetMissingSymbols();
-        public void AddMissingSymbol(string symbol);
-        public void RemoveMissingSymbol(string symbol);
+        public void Add(string symbol);
+        public void Remove(string symbol);
     }
 }

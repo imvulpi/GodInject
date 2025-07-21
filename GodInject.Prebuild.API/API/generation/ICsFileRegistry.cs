@@ -2,7 +2,7 @@
 {
     public interface ICsFileRegistry
     {
-        public string[] GetPaths();
+        public IList<string> GetCsFilePaths();
         public void Add(string path);
         public void Remove(string path);
     }

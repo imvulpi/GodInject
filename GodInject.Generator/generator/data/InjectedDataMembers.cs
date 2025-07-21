@@ -35,7 +35,7 @@ namespace GodInject.Prebuild.injection_generator.data
             {
                 if(property.Type.TypeKind == TypeKind.Error)
                 {
-                    MissingSymbolsRegistry.AddMissingSymbol(property.Type.Name);
+                    MissingSymbolsRegistry.Add(property.Type.Name);
                     continue;
                 }
 
@@ -76,7 +76,7 @@ namespace GodInject.Prebuild.injection_generator.data
             {
                 if (field.Type.TypeKind == TypeKind.Error)
                 {
-                    MissingSymbolsRegistry.AddMissingSymbol(field.Type.Name);
+                    MissingSymbolsRegistry.Add(field.Type.Name);
                     continue;
                 }
 

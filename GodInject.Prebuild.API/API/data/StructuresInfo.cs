@@ -10,6 +10,26 @@ namespace GodInject.Prebuild.API.generation
     {
         public Dictionary<string, FileSignature> FilePaths { get; set; } = [];
         public Dictionary<string, StructureInfo> NameAndStructureInfo { get; set; } = [];
+        public static StructureType GetStructureType(string structureString)
+        {
+            StructureType structure = StructureType.Unknown;
+            switch (structureString)
+            {
+                case "class":
+                    structure = StructureType.Class;
+                    break;
+                case "struct":
+                    structure = StructureType.Struct;
+                    break;
+                case "interface":
+                    structure = StructureType.Interface;
+                    break;
+                case "record":
+                    structure = StructureType.Record;
+                    break;
+            }
+            return structure;
+        }
     }
 
     [MemoryPackable]
@@ -26,6 +46,7 @@ namespace GodInject.Prebuild.API.generation
         public long SizeInBytes { get; set; }
         public long LastWriteTime { get; set; }
     }
+
 
     public enum StructureType
     {

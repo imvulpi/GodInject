@@ -9,11 +9,11 @@ namespace GodInject.Prebuild.mods
         public Assembly[] CollectMods(string path)
         {
             var files = FastFileRetriever.GetFilesRecursive(path, "*");
-            List<Assembly> mods = new();
+            List<Assembly> mods = [];
             foreach ((string filePath, FileMetaRef metadata) in files)
             {
-                if ((metadata.FileAttributes & 16) != 16 &&
-                    Path.GetExtension(filePath) == ".dll")
+                bool isNotADirectory = (metadata.FileAttributes & (uint)FileAttributes.Directory) != (uint)FileAttributes.Directory;
+                if (isNotADirectory && Path.GetExtension(filePath) == ".dll")
                 {
                     mods.Add(Assembly.LoadFrom(filePath));
                 }

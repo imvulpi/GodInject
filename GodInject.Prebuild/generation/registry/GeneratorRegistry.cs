@@ -4,18 +4,14 @@ namespace GodInject.Prebuild.generation.registry
 {
     internal class GeneratorRegistry : IGeneratorRegistry
     {
-        public GeneratorRegistry()
-        {
-            Generators = new List<IGenerator>();
-        }
-        internal List<IGenerator> Generators { get; set; }
+        internal List<IGenerator> Generators = [];
 
-        public void AddGenerator(IGenerator generator)
+        public void Add(IGenerator generator)
         {
             Generators.Add(generator);
         }
 
-        public void RemoveGenerator(IGenerator generator)
+        public void Remove(IGenerator generator)
         {
             Generators.Remove(generator);
         }

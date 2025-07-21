@@ -8,6 +8,5 @@ namespace GodInject.Prebuild.API.generation
     public interface IDependencyResolver
     {
         public DocumentInfo[] ResolveDocuments(string path, string[] missingSymbols, ProjectId projectId);
-        public PortableExecutableReference[] ResolveReferences(string path, string[] missingReferences);
     }
 }

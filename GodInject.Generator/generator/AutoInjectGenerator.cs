@@ -50,7 +50,7 @@ namespace GodInject.Generator.injection_generator
                         continue;
                     }
                     if(baseType != null)
-                        MissingSymbolsRegistry.AddMissingSymbol(baseType);
+                        MissingSymbolsRegistry.Add(baseType);
                 }
                 else
                 {

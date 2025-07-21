@@ -17,20 +17,20 @@ namespace GodInject.Generator
         public const string ModuleAuthor = "Vulpi";
         public void Initialize(FrameworkContext frameworkContext)
         {
-            ILogger logger = frameworkContext.runtimeContext.Logger;
+            ILogger logger = frameworkContext.Runtime.Logger;
             logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Module starts initialization");
 
-            ExecutionSettings executionSettings = frameworkContext.runtimeContext.ExecutionSettings;
-            ExecutionPaths executionPaths = frameworkContext.runtimeContext.ExecutionPaths;
-            IMissingSymbolsRegistry missingSymbolsRegistry = frameworkContext.generationContext.GenerationRegistry.MissingSymbolsRegistry;
+            ExecutionSettings executionSettings = frameworkContext.Runtime.ExecutionSettings;
+            ExecutionPaths executionPaths = frameworkContext.Runtime.ExecutionPaths;
+            IMissingSymbolsRegistry missingSymbolsRegistry = frameworkContext.Generation.Registries.MissingSymbolsRegistry;
             IGenerator generator = new AutoInjectGenerator(executionSettings, executionPaths, missingSymbolsRegistry)
             {
                 Logger = logger,
             };
 
             logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Adding generator");
-            IGeneratorRegistry registry = frameworkContext.generationContext.GenerationRegistry.GeneratorRegistry;
-            registry.AddGenerator(generator);
+            IGeneratorRegistry registry = frameworkContext.Generation.Registries.GeneratorRegistry;
+            registry.Add(generator);
             logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Generator was added");
         }
     }

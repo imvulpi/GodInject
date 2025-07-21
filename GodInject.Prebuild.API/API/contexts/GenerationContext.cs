@@ -4,13 +4,13 @@
     {
         public GenerationContext(GenerationDataContext generationDataContext, GenerationRegistries generationRegistry, GenerationTools generationTools)
         {
-            GenerationDataContext = generationDataContext;
-            GenerationRegistry = generationRegistry;
-            GenerationTools = generationTools;
+            Data = generationDataContext;
+            Registries = generationRegistry;
+            Tools = generationTools;
         }
 
-        public GenerationDataContext GenerationDataContext { get; set; }
-        public GenerationRegistries GenerationRegistry { get; set; }
-        public GenerationTools GenerationTools { get; set; }
+        public GenerationDataContext Data { get; set; }
+        public GenerationRegistries Registries { get; set; }
+        public GenerationTools Tools { get; set; }
     }
 }

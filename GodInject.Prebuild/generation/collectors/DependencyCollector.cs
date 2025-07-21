@@ -14,13 +14,14 @@ namespace GodInject.Prebuild.generation.collectors
 
         public void CollectDocument(string path, FileMetaRef metadata)
         {
-            if ((metadata.FileAttributes & (uint)FileAttributes.Directory) != 16)
+            bool isNotADirectory = (metadata.FileAttributes & (uint)FileAttributes.Directory) != (uint)FileAttributes.Directory;
+            if (isNotADirectory)
             {
                 if (!metadata.Name.EndsWith("cs"))
                     return;
 
-                if (LastGenerationInfo == null ||
-                    (LastGenerationInfo != null && LastGenerationInfo.LastRun < metadata.LastWriteTime))
+                bool shouldRegenerate = LastGenerationInfo == null || LastGenerationInfo.LastRun < metadata.LastWriteTime;
+                if (shouldRegenerate)
                 {
                     GenerationRegistries.CsFileRegistry.Add(path);
                 }

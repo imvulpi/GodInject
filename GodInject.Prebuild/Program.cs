@@ -32,13 +32,13 @@ namespace GodInject.Prebuild
                 MainRunner mainRunner = new(frameworkContext);
 
                 modsLoader.LoadAll();
-                var files = FastFileRetriever.GetFilesRecursive(frameworkContext.runtimeContext.ExecutionPaths.ProjectDirPath, "*", [frameworkContext.runtimeContext.ExecutionPaths.GenerationOutputDirPath]);
+                var files = FastFileRetriever.GetFilesRecursive(frameworkContext.Runtime.ExecutionPaths.ProjectDirPath, "*", [frameworkContext.Runtime.ExecutionPaths.GenerationOutputDirPath]);
 
-                frameworkContext.generationContext.GenerationTools.StructureInfoValidator.ProcessStructureInfo(files);
+                frameworkContext.Generation.Tools.StructureInfoValidator.ProcessStructureInfo(files);
                 foreach (var (path, metadata) in files)
                 {
-                    frameworkContext.generationContext.GenerationTools.DependencyCollector.CollectDocument(path, metadata);
-                    frameworkContext.generationContext.GenerationTools.StructureInfoValidator.ValidateFile(path, metadata);
+                    frameworkContext.Generation.Tools.DependencyCollector.CollectDocument(path, metadata);
+                    frameworkContext.Generation.Tools.StructureInfoValidator.ValidateFile(path, metadata);
                 }
 
                 await mainRunner.Run();

@@ -4,21 +4,21 @@ namespace GodInject.Prebuild.generation.registry
 {
     internal class CsFileRegistry : ICsFileRegistry
     {
-        List<string> _documents = [];
-
-        public string[] GetPaths()
-        {
-            return _documents.ToArray();
-        }
+        internal List<string> CsFilePaths = [];
 
         public void Add(string document)
         {
-            _documents.Add(document);
+            CsFilePaths.Add(document);
         }
 
         public void Remove(string document)
         {
-            _documents.Remove(document);
+            CsFilePaths.Remove(document);
+        }
+
+        public IList<string> GetCsFilePaths()
+        {
+            return CsFilePaths;
         }
     }
 }
