@@ -41,12 +41,24 @@ namespace GodInject.Prebuild
                     frameworkContext.Generation.Tools.StructureInfoValidator.ValidateFile(path, metadata);
                 }
 
-                await mainRunner.Run();
+                if (frameworkContext.Generation.Registries.CsFileRegistry.GetCsFilePaths().Count > 0)
+                {
+                    await mainRunner.Run();
+                }
+                else
+                {
+                    await logger.LogInfo("Skipping main loop since no files were changed");
+                }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                _globalLogger?.LogError($"[FATAL] ");
+                string errorMessage =
+                    $"[FATAL] Unhandled exception of type {ex.GetType().FullName} occurred.\n" +
+                    $"Message: {ex.Message}\n" +
+                    $"StackTrace:\n{ex.StackTrace}";
+                _globalLogger?.LogError($"[FATAL] {errorMessage}");
+                return (int)ProgramErrors.Unknown;
             }
             return 0;
         }

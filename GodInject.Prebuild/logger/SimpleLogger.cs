@@ -16,10 +16,8 @@ namespace GodInject.Prebuild.logger
                 $"[ERROR] Exception of type {exception.GetType().FullName} occurred.\n" +
                 $"Message: {exception.Message}\n" +
                 $"StackTrace:\n{exception.StackTrace}";
-            if (!logMessage.EndsWith('\n'))
-            {
-                logMessage += "\n";
-            }
+            message = CheckEndLine(message);
+
             Console.Write(logMessage);
             return Task.CompletedTask;
         }
@@ -27,10 +25,8 @@ namespace GodInject.Prebuild.logger
         public Task LogInfo(string message)
         {
             message = $"[INFO] {message}";
-            if (!message.EndsWith('\n'))
-            {
-                message += "\n";
-            }
+            message = CheckEndLine(message);
+
             Console.Write(message);
             return Task.CompletedTask;
         }
@@ -38,12 +34,17 @@ namespace GodInject.Prebuild.logger
         public Task LogWarning(string message)
         {
             message = $"[WARNING] {message}";
-            if (!message.EndsWith('\n'))
-            {
-                message += "\n";
-            }
+            message = CheckEndLine(message);
+
             Console.Write(message);
             return Task.CompletedTask;
+        }
+
+        private string CheckEndLine(string message)
+        {
+            if (!message.EndsWith('\n'))
+                message += "\n";
+            return message;
         }
     }
 }

@@ -27,7 +27,7 @@ namespace GodInject.Prebuild.logger
                           $"Message: {exception.Message}\n" +
                           $"StackTrace:\n{exception.StackTrace}";
             }
-            CheckEndLine(message);
+            message = CheckEndLine(message);
 
             await TryLogging(logsFilePath, message);
         }
@@ -35,7 +35,7 @@ namespace GodInject.Prebuild.logger
         public async Task LogWarning(string message)
         {
             message = $"[WARNING][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
-            CheckEndLine(message);
+            message = CheckEndLine(message);
 
             await TryLogging(logsFilePath, message);
         }
@@ -43,7 +43,7 @@ namespace GodInject.Prebuild.logger
         public async Task LogInfo(string message)
         {
             message = $"[INFO][{DateTime.Now:yyyy.MM.dd HH:mm:ss:ffff}] {message}";
-            CheckEndLine(message);
+            message = CheckEndLine(message);
 
             await TryLogging(logsFilePath, message);
         }
