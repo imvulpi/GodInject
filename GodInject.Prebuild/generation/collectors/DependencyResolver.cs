@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GodInject.Prebuild.generation.collectors
 {
+    /// <inheritdoc cref="IDependencyResolver"/>
     public class DependencyResolver(GenerationDataContext generationData) : IDependencyResolver
     {
         public DocumentInfo[] ResolveDocuments(string[] missingSymbols, ProjectId projectId)

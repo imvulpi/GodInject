@@ -13,7 +13,7 @@ namespace GodInject.Prebuild.API.generation
         /// </summary>
         /// <param name="path">The file path of the .</param>
         /// <param name="metadata">Metadata associated with the dependency.</param>
-        void CollectDependency(string path, FileMetaRef metadata);
+        void CollectGenerationFile(string path, FileMetaRef metadata);
 
         /// <summary>
         /// Collects metadata references required for generation.

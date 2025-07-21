@@ -2,6 +2,7 @@
 
 namespace GodInject.Prebuild.generation.registry
 {
+    /// <inheritdoc cref="ICsFileRegistry"/>
     internal class CsFileRegistry : ICsFileRegistry
     {
         internal List<string> CsFilePaths = [];

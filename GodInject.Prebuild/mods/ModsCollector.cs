@@ -3,12 +3,20 @@ using System.Reflection;
 
 namespace GodInject.Prebuild.mods
 {
+    /// <summary>
+    /// Collects external mods in a specific path, doesn't evaluate their validity.
+    /// </summary>
     internal class ModsCollector
     {
         public ModsCollector() { }
-        public Assembly[] CollectMods(string path)
+        /// <summary>
+        /// Collects possible .dll mods from a directory and loads their assembly.
+        /// </summary>
+        /// <param name="directoryPath">Path to search for .dlls</param>
+        /// <returns>Loaded assemblies of possible mods</returns>
+        public Assembly[] CollectMods(string directoryPath)
         {
-            var files = FastFileRetriever.GetFilesRecursive(path, "*");
+            var files = FastFileRetriever.GetFilesRecursive(directoryPath, "*");
             List<Assembly> mods = [];
             foreach ((string filePath, FileMetaRef metadata) in files)
             {

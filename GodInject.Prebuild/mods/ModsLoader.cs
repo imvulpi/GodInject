@@ -5,11 +5,20 @@ using System.Reflection;
 
 namespace GodInject.Prebuild.mods
 {
+    /// <summary>
+    /// Processes assemblies and loads valid mods in <paramref name="modsPath"/>
+    /// </summary>
+    /// <param name="logger">Logger to be used for logging </param>
+    /// <param name="modsPath">Directory path where mods should be in</param>
+    /// <param name="frameworkContext">Framework context that will be used in initialization of the mods.</param>
     internal class ModsLoader(ILogger logger, string modsPath, FrameworkContext frameworkContext)
     {
         public string ModsPath { get; set; } = modsPath;
         private ModsCollector ModsCollector { get; set; } = new ModsCollector();
 
+        /// <summary>
+        /// Initializes collected mods from <see cref="ModsPath"/>
+        /// </summary>
         public void LoadAll()
         {
             logger.LogInfo("Loading mods");
@@ -21,6 +30,10 @@ namespace GodInject.Prebuild.mods
             logger.LogInfo("Ends the loading of mods");
         }
 
+        /// <summary>
+        /// Proceses the collected .dll assemblies to find valid mod entries to then initialize the mods with <see cref="FrameworkContext"/>
+        /// </summary>
+        /// <param name="asm">Assembly of possible mods</param>
         private void ProcessAssembly(Assembly asm)
         {
             var types = asm.GetTypes();

@@ -2,6 +2,9 @@
 
 namespace GodInject.Prebuild.logger
 {
+    /// <summary>
+    /// Basic logger used in the early phases to log into the console.
+    /// </summary>
     internal class SimpleLogger : ILogger
     {
         public Task LogError(string message, Exception? exception = null)

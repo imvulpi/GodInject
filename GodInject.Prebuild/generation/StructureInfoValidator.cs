@@ -4,8 +4,26 @@ using GodInject.Prebuild.API.logging;
 using System.Runtime.CompilerServices;
 namespace GodInject.Prebuild.generation
 {
+    /// <summary>
+    /// Validates <see cref="StructuresInfo"/>, finds missing paths within it and attempts to fix it.
+    /// <para>
+    /// Call <see cref="ProcessStructureInfo(IEnumerable{ValueTuple{string, FileMetaRef}})"/> once BEFORE <see cref="ValidateAndFixFile(string, FileMetaRef)"/>
+    /// </para>
+    /// <para>
+    /// Call <see cref="ValidateAndFixFile(string, FileMetaRef)"/> in a loop of project files in order to 
+    /// find missing paths and fix the structures of missing files.
+    /// </para>
+    /// </summary>
+    /// <remarks>
+    /// The methods need to be called by the program in specific order and implementation, this allows for better performance, as this way the validator doesn't need to collect files multiple times.
+    /// </remarks>
+    /// <param name="structuresInfo">Structure info to be validated</param>
+    /// <param name="logger">Logger to be used for logging</param>
     public class StructureInfoValidator(StructuresInfo structuresInfo, ILogger logger) : IStructureInfoValidator
     {
+        /// <summary>
+        /// Missing files in the <see cref="StructuresInfo"/> (moved/deleted)
+        /// </summary>
         public List<KeyValuePair<string, FileSignature>> MissingFiles = [];
         public StructuresInfo StructuresInfo { get; set; } = structuresInfo;
 
@@ -55,6 +73,11 @@ namespace GodInject.Prebuild.generation
             }
         }
 
+        /// <summary>
+        /// Adds a file's path and medatada to the <see cref="StructuresInfo.FilePaths"/> if it's not there.
+        /// </summary>
+        /// <param name="path">Path of the file</param>
+        /// <param name="fileMetadata">Metadata of the file</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void AddIfNotInStructure(string path, FileMetaRef fileMetadata)
         {

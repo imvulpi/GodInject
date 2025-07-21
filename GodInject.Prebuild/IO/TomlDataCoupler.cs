@@ -1,9 +1,11 @@
 ﻿using GodInject.Prebuild.API.data;
-using System.Text.Json;
 using Tomlet;
 
 namespace GodInject.Prebuild.IO
 {
+    /// <summary>
+    /// <see cref="IDataCoupler{T}"/> specifically for TOML (<see cref="TomletMain"/>)
+    /// </summary>
     public class TomlDataCoupler<T> : IDataCoupler<T> where T : class, new()
     {
         private readonly string _filePath;

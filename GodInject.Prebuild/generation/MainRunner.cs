@@ -8,6 +8,14 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace GodInject.Prebuild.generation
 {
+    /// <summary>
+    /// The main generation loop seperated from initialization for better clarity and readablity.
+    /// <para>
+    /// Simplified logic: Creation of workspace and project -> Starting generators -> 
+    /// Main loop -> Iteration on documents (passed to generators, structure reevaluated) -> Resolving missing symbols (breaks on 0 missing, breaks on fails exceeding limit or LOOPS BACK -> (main loop BREAK logic) Ends generators -> saves generation info and structures info.
+    /// </para>
+    /// </summary>
+    /// <param name="frameworkContext">Framework context with valid dependencies</param>
     internal class MainRunner(FrameworkContext frameworkContext)
     {
         public FrameworkContext FrameworkContext { get; private set; } = frameworkContext;
@@ -25,6 +33,13 @@ namespace GodInject.Prebuild.generation
 
         private int currentFails = 0;
         private int maxFails = 2;
+
+        /// <summary>
+        /// Performs the frameworks generation calling the generators.
+        /// </summary>
+        /// <remarks>
+        /// Creates the project, runs generators, reevaluates structures, processes missing symbols and ends generators, saving cache data
+        /// </remarks>
         public async Task Run() {
             await Logger.LogInfo("RUNS main loop");
 
@@ -67,6 +82,12 @@ namespace GodInject.Prebuild.generation
             await Logger.LogInfo("ENDS main loop");
         }
 
+        /// <summary>
+        /// Processes missing symbols, checks whether there are any / fails / attempts to resolve them
+        /// </summary>
+        /// <param name="workspace">Workspace used to resolve the missing symbols</param>
+        /// <param name="projectInfo">Project info used to resolve the missing symbols</param>
+        /// <returns>null if <see cref="maxFails"/> is reached or fails; otherwise the project with attempted resolution of missing symbols</returns>
         private async Task<Project?> ProcessMissingSymbols(AdhocWorkspace workspace, ProjectInfo projectInfo)
         {
             await Logger.LogInfo("RUNS the processing of missing symbols");
@@ -97,11 +118,18 @@ namespace GodInject.Prebuild.generation
             return newProject;
         }
 
+        /// <summary>
+        /// Attempts to resolve missing symbols using <see cref="DependencyResolver"/>
+        /// </summary>
+        /// <param name="workspace">Workspace to apply changes in</param>
+        /// <param name="projectInfo">Project info for new documents creation</param>
+        /// <param name="missingSymbols">Missing symbols that need to be resolved</param>
+        /// <returns>Project with resolved symbols if resolution went ok</returns>
         private async Task<Project?> ResolveMissingSymbols(AdhocWorkspace workspace, ProjectInfo projectInfo, ICollection<string> missingSymbols)
         {
             await Logger.LogInfo("RUNS resolution of missing symbols");
 
-            var resolvedDocuments = DependencyResolver.ResolveDocuments(ExecutionPaths.ProjectDirPath, missingSymbols.ToArray(), projectInfo.Id);
+            var resolvedDocuments = DependencyResolver.ResolveDocuments(missingSymbols.ToArray(), projectInfo.Id);
             Solution solution = workspace.CurrentSolution;
             foreach (var document in resolvedDocuments)
             {
@@ -115,6 +143,12 @@ namespace GodInject.Prebuild.generation
             return newProject;
         }
 
+        /// <summary>
+        /// performs a reevaluation of the <paramref name="document"/>'s structure provided the document's <paramref name="syntaxRoot"/>
+        /// </summary>
+        /// <param name="syntaxRoot">Syntax root of the document</param>
+        /// <param name="document">The document to be reevaluated</param>
+        /// <returns>Reevaluation task</returns>
         private async Task ReconstructStructuresInfo(SyntaxNode syntaxRoot, Document document)
         {
             await Logger.LogInfo($"RUNS the reconstruction of structures for {document.Name}");
@@ -178,6 +212,10 @@ namespace GodInject.Prebuild.generation
             }
         }
 
+        /// <summary>
+        /// Creates a project with colected metadata references by <see cref=" GenerationFileCollector"/> and document infos from <see cref="GetDocumentInfos(ProjectId)"/> as well as some common system references.
+        /// </summary>
+        /// <returns>A fully setup project info ready to be added into the workspace</returns>
         private ProjectInfo? CreateProject()
         {
             Logger.LogInfo($"RUNS creation of the project");
@@ -205,6 +243,16 @@ namespace GodInject.Prebuild.generation
             return projectInfo;
         }
 
+        /// <summary>
+        /// Creates <see cref="DocumentInfo"/>s from the project's root directory
+        /// </summary>
+        /// <remarks>
+        /// It gets the project file paths by using <see cref="CsFileRegistry"/>
+        /// which it then turns into document infos.
+        /// <para>The document infos need the filepath to be provided.</para>
+        /// </remarks>
+        /// <param name="projectId">Project id for creating the document</param>
+        /// <returns>A array of <see cref="DocumentInfo"/>s of the project files.</returns>
         private DocumentInfo[] GetDocumentInfos(ProjectId projectId)
         {
             IList<string> filePaths = CsFileRegistry.GetCsFilePaths();
@@ -214,7 +262,7 @@ namespace GodInject.Prebuild.generation
                 string path = filePaths[i];
                 documentInfos[i] = DocumentInfo.Create(
                     DocumentId.CreateNewId(projectId),
-                    Path.GetFileNameWithoutExtension(path),
+                    Path.GetFileName(path),
                     null,
                     SourceCodeKind.Script,
                     TextLoader.From(TextAndVersion.Create(SourceText.From(File.ReadAllText(path)), VersionStamp.Create(), path)),

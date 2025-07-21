@@ -3,6 +3,9 @@ using System.Text.Json;
 
 namespace GodInject.Prebuild.IO
 {
+    /// <summary>
+    /// <see cref="IDataCoupler{T}"/> specifically for JSON (<see cref="JsonSerializer"/>)
+    /// </summary>
     public class JsonDataCoupler<T> : IDataCoupler<T> where T : class, new()
     {
         private readonly string _filePath;

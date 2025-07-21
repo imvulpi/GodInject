@@ -2,6 +2,7 @@
 
 namespace GodInject.Prebuild.generation.registry
 {
+    /// <inheritdoc cref="IGeneratorRegistry"/>
     internal class GeneratorRegistry : IGeneratorRegistry
     {
         internal List<IGenerator> Generators = [];

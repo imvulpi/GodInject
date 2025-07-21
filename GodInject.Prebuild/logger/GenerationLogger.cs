@@ -3,6 +3,12 @@ using GodInject.Prebuild.API.logging;
 
 namespace GodInject.Prebuild.logger
 {
+    /// <summary>
+    /// Interface for logging messages at various severity levels to a file in a specific file format.
+    /// </summary>
+    /// <remarks>
+    /// Restricts logs amount to <see cref="MaxLogFiles"/>
+    /// </remarks>
     internal class GenerationLogger : ILogger
     {
         private const string LOGS_PREFIX = "logs~";

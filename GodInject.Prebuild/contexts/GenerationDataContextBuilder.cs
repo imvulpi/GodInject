@@ -6,8 +6,18 @@ using GodInject.Prebuild.IO;
 
 namespace GodInject.Prebuild.contexts
 {
+    /// <summary>
+    /// Builds the <see cref="GenerationDataContext"/> using <see cref="BuildAsync(ExecutionPaths, ExecutionSettings)"/>
+    /// </summary>
+    /// <param name="logger">Logger to be used for logging</param>
     public class GenerationDataContextBuilder(ILogger logger)
     {
+        /// <summary>
+        /// Creates <see cref="GenerationDataContext"/> using <paramref name="executionPaths"/> and <paramref name="executionSettings"/> 
+        /// </summary>
+        /// <param name="executionPaths">Paths to be used in creation of instances</param>
+        /// <param name="executionSettings">Settings to be used in creation of instances</param>
+        /// <returns>A <see cref="GenerationDataContext"/> with filled dependencies</returns>
         public async Task<GenerationDataContext> BuildAsync(ExecutionPaths executionPaths, ExecutionSettings executionSettings)
         {
             await logger.LogInfo("Creating generation data context");
@@ -29,12 +39,18 @@ namespace GodInject.Prebuild.contexts
                 absoluteDllPaths);
         }
 
-        private string[] GetAbsolutePaths(string basePath, string[] paths)
+        /// <summary>
+        /// Turns relative paths to absolute paths using <paramref name="basePath"/>
+        /// </summary>
+        /// <param name="basePath">Base path to be applied on <paramref name="relativePaths"/></param>
+        /// <param name="relativePaths">Relative paths</param>
+        /// <returns>Absolute paths of <paramref name="basePath"/> and <paramref name="relativePaths"/></returns>
+        private string[] GetAbsolutePaths(string basePath, string[] relativePaths)
         {
-            string[] absoluteDllPaths = new string[paths.Length];
-            for (int i = 0; i < paths.Length; i++)
+            string[] absoluteDllPaths = new string[relativePaths.Length];
+            for (int i = 0; i < relativePaths.Length; i++)
             {
-                string dllPath = paths[i];
+                string dllPath = relativePaths[i];
                 absoluteDllPaths[i] = Path.GetFullPath(Path.Join(basePath, dllPath));
             }
             return absoluteDllPaths;

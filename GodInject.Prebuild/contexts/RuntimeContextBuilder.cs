@@ -5,8 +5,17 @@ using GodInject.Prebuild.constants;
 using GodInject.Prebuild.IO;
 using GodInject.Prebuild.logger;
 
+/// <summary>
+/// Builds the <see cref="RuntimeContext"/> using <see cref="BuildAsync(string[])"/>
+/// </summary>
+/// <param name="logger">Logger to be used for logging</param>
 public class RuntimeContextBuilder(ILogger logger)
 {
+    /// <summary>
+    /// Creates the <see cref="RuntimeContext"/> using <paramref name="args"/>
+    /// </summary>
+    /// <param name="args">Program arguments (from <see cref="GodInject.Prebuild.Program.Main(string[])"/>)</param>
+    /// <returns>A task with <see cref="RuntimeContext"/> value</returns>
     public async Task<RuntimeContext> BuildAsync(string[] args)
     {
         await logger.LogInfo("Creating runtime context");
@@ -14,14 +23,23 @@ public class RuntimeContextBuilder(ILogger logger)
         var coupler = new TomlDataCoupler<ExecutionSettings>(GetExecutionSettingsPath(args));
         var settings = await GetExecutionSettings(coupler);
         var paths = new ExecutionPaths(args[0], settings);
-        logger = SwitchLogger(logger, paths.FrameworkFilesDirPath);
+        SwitchLogger(ref logger, paths.FrameworkFilesDirPath);
 
         await logger.LogInfo("Created runtime context");
 
         return new RuntimeContext(coupler, settings, paths, logger);
     }
 
-    public ILogger SwitchLogger(ILogger logger, string output)
+    /// <summary>
+    /// Switched the logger instance to a <see cref="GenerationLogger"/>
+    /// </summary>
+    /// <remarks>
+    /// This is mostly used for logging :P
+    /// </remarks>
+    /// <param name="logger">Logger to switch</param>
+    /// <param name="output">Output directory of the new logger</param>
+    /// <returns>Newly created logger that the <paramref name="logger"/> was switched to</returns>
+    public ILogger SwitchLogger(ref ILogger logger, string output)
     {
         logger.LogInfo("Switches logger type to a file logger");
         logger = new GenerationLogger(output);
@@ -29,6 +47,12 @@ public class RuntimeContextBuilder(ILogger logger)
         return logger;
     }
 
+    /// <summary>
+    /// Processes <paramref name="args"/> to retrieve the passed by user path of <see cref="ExecutionSettings"/> Or in case
+    /// of no path it locates and creates a default path for the settings.
+    /// </summary>
+    /// <param name="args">Program arguments (from <see cref="GodInject.Prebuild.Program.Main(string[])"/></param>
+    /// <returns>A path to <see cref="ExecutionSettings"/> file</returns>
     private string GetExecutionSettingsPath(string[] args)
     {
         string projectCsprojPath = args[0];
@@ -73,6 +97,11 @@ public class RuntimeContextBuilder(ILogger logger)
         }
     }
 
+    /// <summary>
+    /// Gets the <see cref="ExecutionSettings"/> using a provided <paramref name="coupler"/>
+    /// </summary>
+    /// <param name="coupler">Coupler to be used to retrieve the settings</param>
+    /// <returns>A Task with <see cref="ExecutionSettings"/> value</returns>
     private async Task<ExecutionSettings> GetExecutionSettings(TomlDataCoupler<ExecutionSettings> coupler)
     {
         ExecutionSettings? executionSettings = await coupler.ReadAsync();

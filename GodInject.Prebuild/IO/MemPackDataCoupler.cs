@@ -3,6 +3,9 @@ using MemoryPack;
 
 namespace GodInject.Prebuild.IO
 {
+    /// <summary>
+    /// <see cref="IDataCoupler{T}"/> specifically for MemoryPack (<see cref="MemoryPackSerializer"/>)
+    /// </summary>
     public class MemPackDataCoupler<T>(string filePath, MemoryPackSerializerOptions? memPackOptions = null) : IDataCoupler<T> where T : class, new()
     {
         private readonly string _filePath = filePath;

@@ -2,6 +2,7 @@
 
 namespace GodInject.Prebuild.generation.registry
 {
+    /// <inheritdoc cref="IMissingSymbolsRegistry"/>
     internal class MissingSymbolRegistry : IMissingSymbolsRegistry
     {
         internal HashSet<string> MissingSymbols = [];
