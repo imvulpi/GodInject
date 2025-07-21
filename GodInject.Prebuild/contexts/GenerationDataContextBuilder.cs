@@ -15,7 +15,7 @@ namespace GodInject.Prebuild.contexts
             await logger.LogInfo("Reading generation info");
             GenerationInfo? generationInfo = await generationInfoCoupler.ReadAsync();
 
-            IDataCoupler<StructuresInfo> structuresInfoCoupler = new MemPackDataCoupler<StructuresInfo>(Path.Join(executionPaths.GeneratorFilesDirPath, "structures.bin"));
+            IDataCoupler<StructuresInfo> structuresInfoCoupler = new MemPackDataCoupler<StructuresInfo>(Path.Join(executionPaths.FrameworkFilesDirPath, "structures.bin"));
             await logger.LogInfo("Reading structures info");
             StructuresInfo? structuresInfo = await structuresInfoCoupler.ReadAsync();
             structuresInfo ??= new StructuresInfo();

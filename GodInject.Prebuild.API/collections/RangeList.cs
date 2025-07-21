@@ -3,9 +3,13 @@
 namespace GodInject.Prebuild.API.collections
 {
     /// <summary>
-    /// List supporting manipulation of ranges
-    /// A wrapper around regular system List, since it supports ranges.
+    /// A list implementation that supports range-based operations through the <see cref="IRangeList{T}"/> interface.
     /// </summary>
+    /// <remarks>
+    /// Internally uses a <see cref="List{T}"/>, which provides range methods but does not expose them via an interface.
+    /// This class enables access to those capabilities with an interface.
+    /// </remarks>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
     public class RangeList<T> : IRangeList<T>
     {
         private readonly List<T> _list;

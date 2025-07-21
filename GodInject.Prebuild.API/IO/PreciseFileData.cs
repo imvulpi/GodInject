@@ -4,6 +4,7 @@ namespace GodInject.Prebuild.API.IO
 {
     /// <summary>
     /// More manageable structure for file metadata.
+    /// To be used when writing onto a disk
     /// </summary>
     public struct PreciseFileData
     {

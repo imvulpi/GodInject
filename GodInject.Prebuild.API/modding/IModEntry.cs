@@ -3,15 +3,15 @@
 namespace GodInject.Prebuild.API.modding
 {
     /// <summary>
-    /// The main entry of any mod.
-    /// !!! Must be used with <see cref="ModEntryAttribute"/>
+    /// The main entry point for any mod.
+    /// <para>Must be used together with <see cref="ModEntryAttribute"/>.</para>
     /// </summary>
     public interface IModEntry
     {
         /// <summary>
-        /// Function that will get called during mod loading,
-        /// before any generation occurs.
+        /// Called during mod loading, before any generation takes place.
         /// </summary>
-        public void Initialize(FrameworkContext modContext);
+        /// <param name="modContext">The framework context providing access to shared systems and services.</param>
+        void Initialize(FrameworkContext modContext);
     }
 }

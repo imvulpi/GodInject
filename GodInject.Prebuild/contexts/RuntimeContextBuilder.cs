@@ -14,7 +14,7 @@ public class RuntimeContextBuilder(ILogger logger)
         var coupler = new TomlDataCoupler<ExecutionSettings>(GetExecutionSettingsPath(args));
         var settings = await GetExecutionSettings(coupler);
         var paths = new ExecutionPaths(args[0], settings);
-        logger = SwitchLogger(logger, paths.GeneratorFilesDirPath);
+        logger = SwitchLogger(logger, paths.FrameworkFilesDirPath);
 
         await logger.LogInfo("Created runtime context");
 

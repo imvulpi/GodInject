@@ -6,13 +6,13 @@ using Microsoft.CodeAnalysis;
 
 namespace GodInject.Prebuild.generation.collectors
 {
-    public class DependencyCollector(GenerationRegistries generationRegistries, GenerationDataContext generationData) : IDependencyCollector
+    public class DependencyCollector(GenerationRegistries generationRegistries, GenerationDataContext generationData) : IGenerationFileCollector
     {
         public GenerationRegistries GenerationRegistries { get; private set; } = generationRegistries;
         public GenerationDataContext GenerationData { get; private set; } = generationData;
         public GenerationInfo? LastGenerationInfo => GenerationData.GenerationInfo;
 
-        public void CollectDocument(string path, FileMetaRef metadata)
+        public void CollectDependency(string path, FileMetaRef metadata)
         {
             bool isNotADirectory = (metadata.FileAttributes & (uint)FileAttributes.Directory) != (uint)FileAttributes.Directory;
             if (isNotADirectory)

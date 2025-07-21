@@ -9,9 +9,13 @@ namespace GodInject.Prebuild.API.IO
 #pragma warning disable CS8602 // Dereference of a possibly null reference. (SourceType tells us what will be null or not)
 
     /// <summary>
-    /// A heavily optimized struct for file metadata, please work on this as if it was an array,
-    /// use indexes and then process individual informations []
+    /// A heavily optimized struct for file name and metadata access.
     /// </summary>
+    /// <remarks>
+    /// Designed for performance critical scenarios. Use index based access and treat it similarly to a metadata array.
+    /// Implements <see cref="IEnumerable{FileMetaRef}"/> for compatibility, but should be used with indexing for best performance.
+    /// Internally uses Lists with information from native API calls.
+    /// </remarks>
     public struct FileMetaRef : IEnumerable<FileMetaRef>
     {
         public FileMetaRef this[int i]
@@ -29,8 +33,7 @@ namespace GodInject.Prebuild.API.IO
         private readonly IRangeList<FileInfo>? _otherArray;
         private readonly IRangeList<(FILE_DIRECTORY_INFORMATION info, string name)>? _winNTArray;
         private readonly IRangeList<WIN32_FIND_DATA>? _win32Array;
-        private IList<string> _pathsArray = new List<string>();
-        private IList<(Range, int)> _pathsRanges = new List<(Range, int)>();
+
         public FileMetaRef(IRangeList<(FILE_DIRECTORY_INFORMATION, string)>? array)
         {
             Count = array.Count;
@@ -137,6 +140,7 @@ namespace GodInject.Prebuild.API.IO
                 throw new InvalidOperationException("Incompatible file metadata source types");
             }
 
+#pragma warning disable CS8604 // Possible null reference argument.
             switch (_type)
             {
                 case FileSourceType.WinNT:
@@ -149,6 +153,8 @@ namespace GodInject.Prebuild.API.IO
                     _otherArray.AddRange(fileMetaRef._otherArray);
                     break;
             };
+#pragma warning restore CS8604 // Possible null reference argument.
+
             return this;
         }
 

@@ -7,7 +7,7 @@ namespace GodInject.Prebuild.generation.collectors
 {
     public class DependencyResolver(GenerationDataContext generationData) : IDependencyResolver
     {
-        public DocumentInfo[] ResolveDocuments(string path, string[] missingSymbols, ProjectId projectId)
+        public DocumentInfo[] ResolveDocuments(string[] missingSymbols, ProjectId projectId)
         {
             List<DocumentInfo> resolvedDocuments = [];
             foreach (string missing in missingSymbols)

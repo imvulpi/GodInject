@@ -2,17 +2,28 @@
 
 namespace GodInject.Prebuild.API.contexts
 {
-    public class GenerationTools
+    /// <summary>
+    /// Contains tool classes used during or prior to the generation process.
+    /// </summary>
+    /// <remarks>
+    /// These tools assist with dependency collection, dependency resolution using <see cref="StructuresInfo"/>,
+    /// and validation of structures to ensure correctness or identify necessary corrections.
+    /// </remarks>
+    public class GenerationTools(IGenerationFileCollector generationFileCollector, IDependencyResolver dependencyResolver, IStructureInfoValidator structureInfoValidator)
     {
-        public GenerationTools(IDependencyCollector dependencyCollector, IDependencyResolver dependencyResolver, IStructureInfoValidator structureInfoValidator)
-        {
-            DependencyCollector = dependencyCollector;
-            DependencyResolver = dependencyResolver;
-            StructureInfoValidator = structureInfoValidator;
-        }
+        /// <summary>
+        /// Collects dependencies required during generation.
+        /// </summary>
+        public IGenerationFileCollector FileCollector { get; set; } = generationFileCollector;
 
-        public IDependencyCollector DependencyCollector { get; set; }
-        public IDependencyResolver DependencyResolver { get; set; }
-        public IStructureInfoValidator StructureInfoValidator { get; set; }
+        /// <summary>
+        /// Resolves dependencies usually by using <see cref="StructuresInfo"/> and other context data.
+        /// </summary>
+        public IDependencyResolver DependencyResolver { get; set; } = dependencyResolver;
+
+        /// <summary>
+        /// Validates <see cref="StructuresInfo"/> to ensure it is correct or identify necessary corrections.
+        /// </summary>
+        public IStructureInfoValidator StructureInfoValidator { get; set; } = structureInfoValidator;
     }
 }

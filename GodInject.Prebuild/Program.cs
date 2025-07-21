@@ -37,8 +37,8 @@ namespace GodInject.Prebuild
                 frameworkContext.Generation.Tools.StructureInfoValidator.ProcessStructureInfo(files);
                 foreach (var (path, metadata) in files)
                 {
-                    frameworkContext.Generation.Tools.DependencyCollector.CollectDocument(path, metadata);
-                    frameworkContext.Generation.Tools.StructureInfoValidator.ValidateFile(path, metadata);
+                    frameworkContext.Generation.Tools.FileCollector.CollectDependency(path, metadata);
+                    frameworkContext.Generation.Tools.StructureInfoValidator.ValidateAndFixFile(path, metadata);
                 }
 
                 if (frameworkContext.Generation.Registries.CsFileRegistry.GetCsFilePaths().Count > 0)

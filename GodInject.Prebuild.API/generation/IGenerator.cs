@@ -2,16 +2,32 @@
 namespace GodInject.Prebuild.API.generation
 {
     /// <summary>
-    /// Generators follow a simple cycle, firstly the <see cref="Start"/> gets called, then for each
-    /// document the <see cref="Generate(Document)"/> is called, finishing with the <see cref="End"/>
-    /// 
-    /// To register a generator use <see cref="IGeneratorRegistry"/>
-    /// To add missing symbols use <see cref="IMissingSymbolsRegistry"/>
+    /// Defines a code generator with a simple lifecycle: <see cref="Start"/> is called once at the beginning,
+    /// followed by <see cref="Generate(Document, SyntaxNode?, SemanticModel?)"/> for each document,
+    /// and ending with <see cref="End"/>.
     /// </summary>
+    /// <remarks>
+    /// To register a generator, use <see cref="IGeneratorRegistry"/>.
+    /// To report missing symbols during generation, use <see cref="IMissingSymbolsRegistry"/>.
+    /// </remarks>
     public interface IGenerator
     {
-        public void Start();
-        public void Generate(Document document, SyntaxNode? syntaxRoot, SemanticModel? semanticModel);
-        public void End();
+        /// <summary>
+        /// Called once before generation begins.
+        /// </summary>
+        void Start();
+
+        /// <summary>
+        /// Called for each document to perform generation logic.
+        /// </summary>
+        /// <param name="document">The document being processed.</param>
+        /// <param name="syntaxRoot">The syntax root of the document, if available.</param>
+        /// <param name="semanticModel">The semantic model of the document, if available.</param>
+        void Generate(Document document, SyntaxNode? syntaxRoot, SemanticModel? semanticModel);
+
+        /// <summary>
+        /// Called once after all documents have been processed.
+        /// </summary>
+        void End();
     }
 }

@@ -1,14 +1,26 @@
 ﻿namespace GodInject.Prebuild.API.contexts
 {
-    public class FrameworkContext
+    /// <summary>
+    /// Represents the main context of the framework, containing all core services and dependencies
+    /// initialized during the startup phase.
+    /// </summary>
+    /// <remarks>
+    /// This context is passed to the main loop and external modules (mods), providing them access to
+    /// shared systems and registries. Mods can use this context to replace default implementations of
+    /// interfaces, register their own components, or extend core functionality dynamically.
+    /// </remarks>
+    public class FrameworkContext(RuntimeContext runtimeContext, GenerationContext generationContext)
     {
-        public FrameworkContext(RuntimeContext runtimeContext, GenerationContext generationContext)
-        {
-            this.Runtime = runtimeContext;
-            this.Generation = generationContext;
-        }
+        /// <summary>
+        /// Provides access to runtime systems and state.
+        /// See <see cref="RuntimeContext"/>.
+        /// </summary>
+        public RuntimeContext Runtime { get; set; } = runtimeContext;
 
-        public RuntimeContext Runtime { get; set; }
-        public GenerationContext Generation { get; set; }
+        /// <summary>
+        /// Provides access to generation systems and data.
+        /// See <see cref="GenerationContext"/>.
+        /// </summary>
+        public GenerationContext Generation { get; set; } = generationContext;
     }
 }

@@ -29,7 +29,7 @@ namespace GodInject.Prebuild.generation
             logger.LogInfo($"Ended structures validation with {MissingFiles.Count} missing files");
         }
 
-        public void ValidateFile(string path, FileMetaRef fileMetadata)
+        public void ValidateAndFixFile(string path, FileMetaRef fileMetadata)
         {
             if(StructuresInfo == null) return;
             if (Path.GetExtension(path) != ".cs") return;

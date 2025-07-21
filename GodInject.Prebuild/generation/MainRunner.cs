@@ -11,7 +11,7 @@ namespace GodInject.Prebuild.generation
     internal class MainRunner(FrameworkContext frameworkContext)
     {
         public FrameworkContext FrameworkContext { get; private set; } = frameworkContext;
-        public IDependencyCollector DependencyCollector => FrameworkContext.Generation.Tools.DependencyCollector;
+        public IGenerationFileCollector GenerationFileCollector => FrameworkContext.Generation.Tools.FileCollector;
         public IDependencyResolver DependencyResolver => FrameworkContext.Generation.Tools.DependencyResolver;
         public IDataCoupler<GenerationInfo> GenerationInfoCoupler => FrameworkContext.Generation.Data.GenerationInfoCoupler;
         public ExecutionPaths ExecutionPaths => FrameworkContext.Runtime.ExecutionPaths;
@@ -184,7 +184,7 @@ namespace GodInject.Prebuild.generation
             string projectName = Path.GetFileNameWithoutExtension(ExecutionPaths.CsprojPath);
             ProjectId projectId = ProjectId.CreateNewId(projectName);
 
-            MetadataReference[] usersReferences = DependencyCollector.CollectExecReferences();
+            MetadataReference[] usersReferences = GenerationFileCollector.CollectExecReferences();
             DocumentInfo[] documentInfos = GetDocumentInfos(projectId);
             List<MetadataReference> references =
             [

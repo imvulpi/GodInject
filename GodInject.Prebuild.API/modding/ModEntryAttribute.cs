@@ -1,9 +1,13 @@
 ﻿namespace GodInject.Prebuild.API.modding
 {
     /// <summary>
-    /// Used to mark the mod entry, this is used to load the mods, without the attribute no mod will get found.
-    /// Contains basic information about the mod,
+    /// Marks a class as the entry point of a mod.
+    /// <para>Required for mod discovery and loading by the framework.</para>
     /// </summary>
+    /// <remarks>
+    /// Contains basic metadata about the mod.
+    /// </remarks>
+    [AttributeUsage(AttributeTargets.Class)]
     public class ModEntryAttribute : Attribute
     {
         public string Name { get; }
