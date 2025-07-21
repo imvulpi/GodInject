@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace GodInject.Prebuild.utils
+namespace GodInject.Generator.utils
 {
     /// <summary>
     /// Class providing helpful methods for code symbol processing

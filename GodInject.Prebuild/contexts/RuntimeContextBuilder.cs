@@ -2,21 +2,21 @@
 using GodInject.Prebuild.API.data;
 using GodInject.Prebuild.API.logging;
 using GodInject.Prebuild.constants;
-using GodInject.Prebuild.data;
+using GodInject.Prebuild.IO;
 using GodInject.Prebuild.logger;
 
 public class RuntimeContextBuilder(ILogger logger)
 {
     public async Task<RuntimeContext> BuildAsync(string[] args)
     {
-        await logger.LogInfo("Starts collection of execution settings");
+        await logger.LogInfo("Creating runtime context");
 
         var coupler = new TomlDataCoupler<ExecutionSettings>(GetExecutionSettingsPath(args));
         var settings = await GetExecutionSettings(coupler);
         var paths = new ExecutionPaths(args[0], settings);
         logger = SwitchLogger(logger, paths.GeneratorFilesDirPath);
 
-        await logger.LogInfo("Ends successful collection of base settings");
+        await logger.LogInfo("Created runtime context");
 
         return new RuntimeContext(coupler, settings, paths, logger);
     }

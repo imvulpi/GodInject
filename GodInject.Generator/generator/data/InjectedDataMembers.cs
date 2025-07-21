@@ -1,10 +1,7 @@
 ﻿using GodInject.Prebuild.API.generation;
 using Microsoft.CodeAnalysis;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
-namespace GodInject.Prebuild.injection_generator.data
+namespace GodInject.Generator.generator.data
 {
     public class InjectedDataMembers
     {

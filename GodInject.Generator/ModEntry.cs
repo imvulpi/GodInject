@@ -1,4 +1,4 @@
-﻿using GodInject.Generator.injection_generator;
+﻿using GodInject.Generator.generator;
 using GodInject.Prebuild.API.contexts;
 using GodInject.Prebuild.API.data;
 using GodInject.Prebuild.API.generation;
@@ -13,7 +13,7 @@ namespace GodInject.Generator
     public class ModEntry : IModEntry
     {
         public const string ModuleName = "AutoInject";
-        public const string ModuleVersion = "2.0.0a";
+        public const string ModuleVersion = "2.0.0rc.1";
         public const string ModuleAuthor = "Vulpi";
         public void Initialize(FrameworkContext frameworkContext)
         {
@@ -28,10 +28,10 @@ namespace GodInject.Generator
                 Logger = logger,
             };
 
-            logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Adding generator");
+            logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Registering generator");
             IGeneratorRegistry registry = frameworkContext.Generation.Registries.GeneratorRegistry;
             registry.Add(generator);
-            logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Generator was added");
+            logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Generator was registered");
         }
     }
 }

@@ -1,13 +1,12 @@
-﻿using GodInject.Prebuild.API.data;
+﻿using GodInject.Generator.generator.data;
+using GodInject.Prebuild.API.data;
 using GodInject.Prebuild.API.generation;
 using GodInject.Prebuild.API.IO;
 using GodInject.Prebuild.API.logging;
-using GodInject.Prebuild.injection_generator;
-using GodInject.Prebuild.injection_generator.data;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace GodInject.Generator.injection_generator
+namespace GodInject.Generator.generator
 {
     internal class AutoInjectGenerator : IGenerator
     {

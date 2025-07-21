@@ -1,4 +1,4 @@
-﻿namespace GodInject.Prebuild
+﻿namespace GodInject.Generator
 {
     public static class Constants
     {

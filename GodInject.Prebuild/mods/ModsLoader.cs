@@ -1,21 +1,24 @@
 ﻿using GodInject.Prebuild.API.contexts;
+using GodInject.Prebuild.API.logging;
 using GodInject.Prebuild.API.modding;
 using System.Reflection;
 
 namespace GodInject.Prebuild.mods
 {
-    internal class ModsLoader(string modsPath, FrameworkContext frameworkContext)
+    internal class ModsLoader(ILogger logger, string modsPath, FrameworkContext frameworkContext)
     {
         public string ModsPath { get; set; } = modsPath;
         private ModsCollector ModsCollector { get; set; } = new ModsCollector();
 
         public void LoadAll()
         {
+            logger.LogInfo("Loading mods");
             Assembly[] mods = ModsCollector.CollectMods(ModsPath);
             foreach (Assembly asm in mods)
             {
                 ProcessAssembly(asm);
             }
+            logger.LogInfo("Ends the loading of mods");
         }
 
         private void ProcessAssembly(Assembly asm)

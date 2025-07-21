@@ -1,4 +1,4 @@
-﻿namespace GodInject.Prebuild.utils
+﻿namespace GodInject.Generator.utils
 {
     public static class TextIndentor
     {

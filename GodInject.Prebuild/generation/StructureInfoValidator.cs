@@ -17,7 +17,7 @@ namespace GodInject.Prebuild.generation
 
         public void ProcessStructureInfo(IEnumerable<(string path, FileMetaRef metadata)> files)
         {
-            logger.LogInfo("Starting validation");
+            logger.LogInfo("Starting structures validation");
             Dictionary<string, FileSignature> missingFilesCopy = StructuresInfo.FilePaths.ToDictionary();
 
             foreach (var (path, _) in files)
@@ -26,7 +26,7 @@ namespace GodInject.Prebuild.generation
             }
 
             MissingFiles = missingFilesCopy.ToList();
-            logger.LogInfo($"Ended validation with {MissingFiles.Count} missing files");
+            logger.LogInfo($"Ended structures validation with {MissingFiles.Count} missing files");
         }
 
         public void ValidateFile(string path, FileMetaRef fileMetadata)

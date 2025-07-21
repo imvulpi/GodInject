@@ -2,8 +2,7 @@
 using GodInject.Prebuild.API.data;
 using GodInject.Prebuild.API.generation;
 using GodInject.Prebuild.API.logging;
-using GodInject.Prebuild.data;
-using GodInject.Prebuild.logger;
+using GodInject.Prebuild.IO;
 
 namespace GodInject.Prebuild.contexts
 {
@@ -11,10 +10,13 @@ namespace GodInject.Prebuild.contexts
     {
         public async Task<GenerationDataContext> BuildAsync(ExecutionPaths executionPaths, ExecutionSettings executionSettings)
         {
+            await logger.LogInfo("Creating generation data context");
             IDataCoupler<GenerationInfo> generationInfoCoupler = new JsonDataCoupler<GenerationInfo>(executionPaths.GenerationInfoPath);
+            await logger.LogInfo("Reading generation info");
             GenerationInfo? generationInfo = await generationInfoCoupler.ReadAsync();
 
             IDataCoupler<StructuresInfo> structuresInfoCoupler = new MemPackDataCoupler<StructuresInfo>(Path.Join(executionPaths.GeneratorFilesDirPath, "structures.bin"));
+            await logger.LogInfo("Reading structures info");
             StructuresInfo? structuresInfo = await structuresInfoCoupler.ReadAsync();
             structuresInfo ??= new StructuresInfo();
             string[] absoluteDllPaths = GetAbsolutePaths(executionPaths.ProjectDirPath, executionSettings.ReferencesRelativePaths);

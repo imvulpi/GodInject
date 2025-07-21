@@ -5,7 +5,6 @@ using GodInject.Prebuild.API.logging;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System.Runtime.CompilerServices;
 
 namespace GodInject.Prebuild.generation
 {
@@ -27,7 +26,7 @@ namespace GodInject.Prebuild.generation
         private int currentFails = 0;
         private int maxFails = 2;
         public async Task Run() {
-            await Logger.LogInfo("Running");
+            await Logger.LogInfo("RUNS main loop");
 
             AdhocWorkspace workspace = new();
             ProjectInfo? projectInfo = CreateProject();
@@ -35,13 +34,11 @@ namespace GodInject.Prebuild.generation
             Project project = workspace.AddProject(projectInfo);
 
             IList<IGenerator> generators = GeneratorRegistry.GetGenerators();
-            await Logger.LogInfo($"Starting to process {generators.Count} Generators");
-            StartGenerators(generators);
-            await Logger.LogInfo("Starting the main loop");
+            await StartGenerators(generators);
             while (true)
             {
                 CurrentGenerationInfo.DocumentsCheckedCount = 0;
-                foreach (var document in project.Documents)
+                foreach (Document document in project.Documents)
                 {
                     var syntaxRoot = await document.GetSyntaxRootAsync();
                     var semanticModel = await document.GetSemanticModelAsync();
@@ -54,7 +51,7 @@ namespace GodInject.Prebuild.generation
                     }
 
                     if (syntaxRoot == null) continue;
-                    ReconstructStructuresInfo(syntaxRoot, document);
+                    await ReconstructStructuresInfo(syntaxRoot, document);
                 }
 
                 Project? reprocessedProject = await ProcessMissingSymbols(workspace, projectInfo);
@@ -63,43 +60,46 @@ namespace GodInject.Prebuild.generation
             }
 
 
-            EndGenerators(generators);
+            await EndGenerators(generators);
             CurrentGenerationInfo.LastRun = DateTime.Now.ToFileTimeUtc();
             await GenerationInfoCoupler.SaveAsync(CurrentGenerationInfo);
             await StructureInfoCoupler.SaveAsync(StructuresInfo);
-            await Logger.LogInfo("Stopped");
+            await Logger.LogInfo("ENDS main loop");
         }
 
         private async Task<Project?> ProcessMissingSymbols(AdhocWorkspace workspace, ProjectInfo projectInfo)
         {
+            await Logger.LogInfo("RUNS the processing of missing symbols");
+
+            Project? newProject;
             ICollection<string> missingSymbols = MissingSymbolsRegistry.GetMissingSymbols();
             if (missingSymbols.Count > 0)
             {
-                await Logger.LogInfo("Trying to resolve missing symbols");
                 if (currentFails == maxFails)
                 {
                     CurrentGenerationInfo.WasSuccessful = false;
                     await Logger.LogError($"Generators failed due to missing symbols, ending now, " +
                         $"the missing symbols: {string.Join(", ", missingSymbols)}");
-                    return null;
+                    newProject = null;
                 }
                 else
                 {
                     currentFails++;
-                    Project? newProject = await ResolveMissingSymbols(workspace, projectInfo, missingSymbols);
-                    return newProject;
+                    newProject = await ResolveMissingSymbols(workspace, projectInfo, missingSymbols);
                 }
             }
             else
             {
                 CurrentGenerationInfo.WasSuccessful = true;
-                return null;
+                newProject = null;
             }
+
+            return newProject;
         }
 
         private async Task<Project?> ResolveMissingSymbols(AdhocWorkspace workspace, ProjectInfo projectInfo, ICollection<string> missingSymbols)
         {
-            await Logger.LogInfo("Trying to resolve missing symbols");
+            await Logger.LogInfo("RUNS resolution of missing symbols");
 
             var resolvedDocuments = DependencyResolver.ResolveDocuments(ExecutionPaths.ProjectDirPath, missingSymbols.ToArray(), projectInfo.Id);
             Solution solution = workspace.CurrentSolution;
@@ -111,15 +111,17 @@ namespace GodInject.Prebuild.generation
             workspace.TryApplyChanges(solution);
             Project? newProject = workspace.CurrentSolution.GetProject(projectInfo.Id);
             MissingSymbolsRegistry.GetMissingSymbols().Clear();
+
             return newProject;
         }
 
-        private void ReconstructStructuresInfo(SyntaxNode syntaxRoot, Document? document)
+        private async Task ReconstructStructuresInfo(SyntaxNode syntaxRoot, Document document)
         {
+            await Logger.LogInfo($"RUNS the reconstruction of structures for {document.Name}");
             var types = syntaxRoot.DescendantNodes().OfType<TypeDeclarationSyntax>();
             var enums = syntaxRoot.DescendantNodes().OfType<EnumDeclarationSyntax>();
 
-            List<(string, StructureInfo)> structureInfos = new List<(string, StructureInfo)>();
+            List<(string, StructureInfo)> structureInfos = [];
             var namespaceName = "";
             foreach (var type in types)
             {
@@ -138,14 +140,18 @@ namespace GodInject.Prebuild.generation
                 structureInfos.Add((type.Identifier.Text, new StructureInfo(StructureType.Enum, namespaceName)));
             }
 
+            string documentFilePath = document.FilePath == null ? "" : document.FilePath;
+
+            if (document.FilePath == null)
+            {
+                await Logger.LogError($"Reconstructed {document.Name} structures will be incorrect, the FilePath is unset");
+            }
+
             foreach (var kvp in structureInfos)
             {
                 (string name, StructureInfo info) = kvp;
-                if(document.FilePath == null)
-                {
 
-                }
-                info.FilePath = document.FilePath;
+                info.FilePath = documentFilePath;
                 info.Namespace = namespaceName;
                 if (!StructuresInfo.NameAndStructureInfo.TryAdd(name, info))
                 {
@@ -154,16 +160,18 @@ namespace GodInject.Prebuild.generation
             }
         }
 
-        private void StartGenerators(ICollection<IGenerator> generators)
+        private async Task StartGenerators(ICollection<IGenerator> generators)
         {
+            await Logger.LogInfo("Starts generators");
             foreach (var generator in generators)
             {
                 generator.Start();
             }
         }
 
-        private void EndGenerators(ICollection<IGenerator> generators)
+        private async Task EndGenerators(ICollection<IGenerator> generators)
         {
+            await Logger.LogInfo("ENDS generators");
             foreach (var generator in generators)
             {
                 generator.End();
@@ -172,6 +180,7 @@ namespace GodInject.Prebuild.generation
 
         private ProjectInfo? CreateProject()
         {
+            Logger.LogInfo($"RUNS creation of the project");
             string projectName = Path.GetFileNameWithoutExtension(ExecutionPaths.CsprojPath);
             ProjectId projectId = ProjectId.CreateNewId(projectName);
 
@@ -192,6 +201,7 @@ namespace GodInject.Prebuild.generation
                 projectName,
                 LanguageNames.CSharp
             ).WithMetadataReferences(references).WithDocuments(documentInfos);
+            Logger.LogInfo($"Project contains {references.Count} references and {documentInfos.Length} documents");
             return projectInfo;
         }
 

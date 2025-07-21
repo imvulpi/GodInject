@@ -28,7 +28,7 @@ namespace GodInject.Prebuild
                 _globalLogger = runtimeContext.Logger;
                 GenerationContext generationContext = await new GenerationContextBuilder(logger).BuildAsync(runtimeContext);
                 FrameworkContext frameworkContext = new(runtimeContext, generationContext);
-                ModsLoader modsLoader = new(runtimeContext.ExecutionPaths.ModsDirPath, frameworkContext);
+                ModsLoader modsLoader = new(logger, runtimeContext.ExecutionPaths.ModsDirPath, frameworkContext);
                 MainRunner mainRunner = new(frameworkContext);
 
                 modsLoader.LoadAll();
@@ -47,7 +47,7 @@ namespace GodInject.Prebuild
                 }
                 else
                 {
-                    await logger.LogInfo("Skipping main loop since no files were changed");
+                    await logger.LogInfo("Skipping regeneration since no files were changed");
                 }
             }
             catch (Exception ex)

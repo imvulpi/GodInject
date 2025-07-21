@@ -1,7 +1,7 @@
-﻿using GodInject.Prebuild.injection_generator.data;
-using GodInject.Prebuild.utils;
+﻿using GodInject.Generator.generator.data;
+using GodInject.Generator.utils;
 
-namespace GodInject.Prebuild.injection_generator
+namespace GodInject.Generator.generator
 {
     public class InjectResolverBuilder
     {

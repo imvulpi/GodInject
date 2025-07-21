@@ -1,10 +1,10 @@
 ﻿using System.Text;
 
-namespace GodInject.Prebuild.utils
+namespace GodInject.Generator.utils
 {
     public static class TextHelper
     {
-        public static string FormatNewLines(params string[] texts)
+        public static string FormatNewLines(params string?[] texts)
         {
             if (texts.Length == 0) return "";
             StringBuilder stringBuilder = new();

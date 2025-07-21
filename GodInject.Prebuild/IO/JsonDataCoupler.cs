@@ -1,20 +1,19 @@
 ﻿using GodInject.Prebuild.API.data;
 using System.Text.Json;
-using Tomlet;
 
-namespace GodInject.Prebuild.data
+namespace GodInject.Prebuild.IO
 {
-    public class TomlDataCoupler<T> : IDataCoupler<T> where T : class, new()
+    public class JsonDataCoupler<T> : IDataCoupler<T> where T : class, new()
     {
         private readonly string _filePath;
-        private readonly TomlSerializerOptions _tomlOptions = new(){};
+        private readonly JsonSerializerOptions _jsonOptions = new(){};
 
-        public TomlDataCoupler(string filePath, TomlSerializerOptions? serializerOptions = null)
+        public JsonDataCoupler(string filePath, JsonSerializerOptions? serializerOptions = null)
         {
             _filePath = filePath ?? throw new ArgumentNullException(nameof(filePath));
             if(serializerOptions != null)
             {
-                _tomlOptions = serializerOptions;
+                _jsonOptions = serializerOptions;
             }
         }
 
@@ -29,16 +28,18 @@ namespace GodInject.Prebuild.data
                 return null;
 
             await using var _ = await FileLockManager.WaitAsync(_filePath);
-            string tomlString = await File.ReadAllTextAsync(_filePath);
-            return TomletMain.To<T>(tomlString, _tomlOptions);
+            using var stream = File.OpenRead(_filePath);
+            var data = await JsonSerializer.DeserializeAsync<T>(stream, _jsonOptions);
+            return data;
         }
 
         public async Task SaveAsync(T data)
         {
             ArgumentNullException.ThrowIfNull(data);
+
             await using var _ = await FileLockManager.WaitAsync(_filePath);
-            string tomlString = TomletMain.TomlStringFrom(data, _tomlOptions);
-            await File.WriteAllTextAsync(_filePath, tomlString);
+            using var stream = File.Create(_filePath);
+            await JsonSerializer.SerializeAsync(stream, data, _jsonOptions);
         }
 
         public Task DeleteAsync()

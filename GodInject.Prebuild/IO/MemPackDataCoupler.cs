@@ -1,7 +1,7 @@
 ﻿using GodInject.Prebuild.API.data;
 using MemoryPack;
 
-namespace GodInject.Prebuild.data
+namespace GodInject.Prebuild.IO
 {
     public class MemPackDataCoupler<T>(string filePath, MemoryPackSerializerOptions? memPackOptions = null) : IDataCoupler<T> where T : class, new()
     {

@@ -1,8 +1,8 @@
-﻿using GodInject.Prebuild.injection_generator.data;
-using GodInject.Prebuild.utils;
+﻿using GodInject.Generator.generator.data;
+using GodInject.Generator.utils;
 using Microsoft.CodeAnalysis;
 
-namespace GodInject.Prebuild.injection_generator
+namespace GodInject.Generator.generator
 {
     public class InjectClassBuilder
     {
@@ -48,9 +48,9 @@ namespace GodInject.Prebuild.injection_generator
 
         private string FormatClass(INamedTypeSymbol classSymbol, string classBody)
         {
-            string namespacePart = classSymbol.ContainingNamespace.IsGlobalNamespace || classSymbol.ContainingNamespace == null
+            string? namespacePart = classSymbol.ContainingNamespace.IsGlobalNamespace || classSymbol.ContainingNamespace == null
                 ? null : $"namespace {classSymbol.ContainingNamespace};";
-            var injectClass = TextHelper.FormatNewLines(
+            string? injectClass = TextHelper.FormatNewLines(
                 "#nullable enable",
                 "using System;",
                 $"using {Constants.INJECT_CONTAINER_NAMESPACE};",
@@ -65,7 +65,7 @@ namespace GodInject.Prebuild.injection_generator
 
         private string GetNotificationMethod(INamedTypeSymbol classSymbol, string resolvingText)
         {
-            string userNotificationCall = null;
+            string? userNotificationCall = null;
             if(SymbolHelper.HasMethod(classSymbol, Constants.USER_NOTIFICATION_METHOD))
             {
                 userNotificationCall = $"{Constants.USER_NOTIFICATION_METHOD}({Constants.GODOT_NOTIFICATION_ARG_NAME});";

@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace GodInject.Prebuild.injection_generator.data
+namespace GodInject.Generator.generator.data
 {
     public struct InjectedField
     {
