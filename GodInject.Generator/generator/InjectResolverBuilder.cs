@@ -30,11 +30,11 @@ namespace GodInject.Generator.generator
         {
             string resolveFunc;
             if (field.ServiceKey == null)
-                resolveFunc = $"{Constants.CONTAINER_CLASS_NAME}.Resolve<{field.PropertySymbol.Type}>();";
+                resolveFunc = $"{Constants.CONTAINER_CLASS_NAME}.Resolve<{field.FieldSymbol.Type}>();";
             else
-                resolveFunc = $"{Constants.CONTAINER_CLASS_NAME}.Resolve<{field.PropertySymbol.Type}>(\"{field.ServiceKey}\");";
+                resolveFunc = $"{Constants.CONTAINER_CLASS_NAME}.Resolve<{field.FieldSymbol.Type}>(\"{field.ServiceKey}\");";
 
-            return $"{field.PropertySymbol.Name} = {resolveFunc}";
+            return $"{field.FieldSymbol.Name} = {resolveFunc}";
         }
 
         private string GetTextResolvingMembers(InjectedProperty property)

@@ -4,10 +4,21 @@ using Microsoft.CodeAnalysis;
 
 namespace GodInject.Generator.generator
 {
+    /// <summary>
+    /// Builds the Injection generation output
+    /// </summary>
     public class InjectClassBuilder
     {
         public InjectResolverBuilder InjectResolverBuilder { get; set; } = new InjectResolverBuilder();
 
+        /// <summary>
+        /// Creates a full class output from the class symbol, injected members and other settings
+        /// </summary>
+        /// <param name="classSymbol">Symbol of the class</param>
+        /// <param name="dataMembers">Injected data members (properties/fields)</param>
+        /// <param name="addInjectMethod">Whether it should add a manual injection method</param>
+        /// <param name="addConstructor">Whether it should inject in the constructor</param>
+        /// <returns>The string class ready to save</returns>
         public string CreateClass(INamedTypeSymbol classSymbol, InjectedDataMembers dataMembers, bool addInjectMethod, bool addConstructor) 
         {
             string classBody = "";
@@ -46,6 +57,12 @@ namespace GodInject.Generator.generator
             return TextIndentor.IndentTextLikeCSharp(FormatClass(classSymbol, classBody));
         }
 
+        /// <summary>
+        /// Formats the class in a predictable way.
+        /// </summary>
+        /// <param name="classSymbol">Symbol of the class</param>
+        /// <param name="classBody">Class body</param>
+        /// <returns>Formatted class string</returns>
         private string FormatClass(INamedTypeSymbol classSymbol, string classBody)
         {
             string? namespacePart = classSymbol.ContainingNamespace.IsGlobalNamespace || classSymbol.ContainingNamespace == null
@@ -63,6 +80,12 @@ namespace GodInject.Generator.generator
             return injectClass.ToString();
         }
 
+        /// <summary>
+        /// Creates a notification method that allows injection through the _Notification in Godot
+        /// </summary>
+        /// <param name="classSymbol">Symbol of the class</param>
+        /// <param name="resolvingText">Text resolving the data members marked with [Inject]</param>
+        /// <returns>String with the notification resolution</returns>
         private string GetNotificationMethod(INamedTypeSymbol classSymbol, string resolvingText)
         {
             string? userNotificationCall = null;
@@ -85,6 +108,12 @@ namespace GodInject.Generator.generator
             );
         }
 
+        /// <summary>
+        /// Creates a constructor using the class name and constructor body.
+        /// </summary>
+        /// <param name="className">The class name</param>
+        /// <param name="constructorBody">The body of the constructor</param>
+        /// <returns>The constructormm</returns>
         private string GetConstructor(string className, string constructorBody)
         {
             return TextHelper.FormatNewLines(
@@ -95,6 +124,11 @@ namespace GodInject.Generator.generator
             );
         }
 
+        /// <summary>
+        /// Creates a manual injection method and method body
+        /// </summary>
+        /// <param name="methodBody">The body of the method</param>
+        /// <returns>The manual injection method</returns>
         private string GetManagedInjectionMethod(string methodBody)
         {
             return TextHelper.FormatNewLines(

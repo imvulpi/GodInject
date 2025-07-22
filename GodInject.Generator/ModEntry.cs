@@ -7,6 +7,9 @@ using GodInject.Prebuild.API.modding;
 
 namespace GodInject.Generator
 {
+    /// <summary>
+    /// The entry of the generation module.
+    /// </summary>
     [ModEntry(ModuleName, ModuleVersion, ModuleAuthor,
         "Generated automatic resolution of injections based on a global container" +
         "Resolves dependencies marked with [Inject] Attributes in a partial class")]
@@ -15,15 +18,19 @@ namespace GodInject.Generator
         public const string ModuleName = "AutoInject";
         public const string ModuleVersion = "2.0.0rc.1";
         public const string ModuleAuthor = "Vulpi";
+
+        /// <summary>
+        /// Initialization of the module, Creates a generator class and registers it.
+        /// </summary>
+        /// <param name="frameworkContext">Generation framework context</param>
         public void Initialize(FrameworkContext frameworkContext)
         {
             ILogger logger = frameworkContext.Runtime.Logger;
             logger.LogInfo($"[{ModuleName}][{ModuleVersion}] Module starts initialization");
 
-            ExecutionSettings executionSettings = frameworkContext.Runtime.ExecutionSettings;
             ExecutionPaths executionPaths = frameworkContext.Runtime.ExecutionPaths;
             IMissingSymbolsRegistry missingSymbolsRegistry = frameworkContext.Generation.Registries.MissingSymbolsRegistry;
-            IGenerator generator = new AutoInjectGenerator(executionSettings, executionPaths, missingSymbolsRegistry)
+            IGenerator generator = new AutoInjectGenerator(executionPaths, missingSymbolsRegistry)
             {
                 Logger = logger,
             };

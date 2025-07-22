@@ -3,6 +3,10 @@ using Microsoft.CodeAnalysis;
 
 namespace GodInject.Generator.generator.data
 {
+
+    /// <summary>
+    /// Stores and retrieves <see cref="InjectedProperty"/> and <see cref="InjectedField"/> of a class symbol
+    /// </summary>
     public class InjectedDataMembers
     {
         public InjectedDataMembers(INamedTypeSymbol classSymbol, IMissingSymbolsRegistry symbolsRegistry)
@@ -16,6 +20,11 @@ namespace GodInject.Generator.generator.data
         public InjectedField[] InjectedFields { get; set; }
         public IMissingSymbolsRegistry MissingSymbolsRegistry { get; set; }
 
+        /// <summary>
+        /// Retrieves properties that are marked with [Inject] attribute
+        /// </summary>
+        /// <param name="classSymbol">Symbol to analyze</param>
+        /// <returns>a <see cref="InjectedProperty[]"/> filled with properties marked by [Inject]</returns>
         public InjectedProperty[] GetInjectedProperties(INamedTypeSymbol classSymbol)
         {
             var properties = classSymbol.GetMembers()
@@ -57,6 +66,11 @@ namespace GodInject.Generator.generator.data
             return injectedProperties.ToArray();
         }
 
+        /// <summary>
+        /// Retrieves fields that are marked with [Inject] attribute
+        /// </summary>
+        /// <param name="classSymbol">Symbol to analyze</param>
+        /// <returns>a <see cref="InjectedProperty[]"/> filled with fields marked by [Inject]</returns>
         public InjectedField[] GetInjectedFields(INamedTypeSymbol classSymbol)
         {
             var fields = classSymbol.GetMembers()

@@ -2,14 +2,20 @@
 
 namespace GodInject.Generator.generator.data
 {
-    public struct InjectedProperty
+    /// <summary>
+    /// A property that is marked with [Inject] attribute
+    /// contains the service key that is used in the Inject attribute constructor
+    /// </summary>
+    public struct InjectedProperty(IPropertySymbol symbol, string? serviceKey)
     {
-        public IPropertySymbol PropertySymbol { get; set; }
-        public string? ServiceKey { get; set; }
-        public InjectedProperty(IPropertySymbol symbol, string? serviceKey)
-        {
-            PropertySymbol = symbol;
-            ServiceKey = serviceKey;
-        }
+        /// <summary>
+        /// The symbol of the property marked with [Inject]
+        /// </summary>
+        public IPropertySymbol PropertySymbol { get; set; } = symbol;
+
+        /// <summary>
+        /// Service key of the property, or null if no symbol key is used.
+        /// </summary>
+        public string? ServiceKey { get; set; } = serviceKey;
     }
 }
