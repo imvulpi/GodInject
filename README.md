@@ -1,6 +1,6 @@
 # GodInject
 
-A powerful and flexible **Dependency Injection (DI) library** for **Godot, and other frameworks**. Based on **DryIoc**, it provides **automatic property injection**, **service keys**, **factories** and more
+A powerful and flexible **Dependency Injection (DI) generator** for **Godot, and other frameworks**. Based on **DryIoc**, it provides **automatic property injection**, **service keys**, **factories** and more
 
 ## Features
 
@@ -18,26 +18,74 @@ GodInject ensures dependency injection without using reflection, relying entirel
 If you plan to configure DryIoc manually, keep this in mind if you need AOT compatibility.
 
 ## Installation
+### Download the Release Bundle
+Includes:
+  - Injection Generation Mod (used by the framework)
+  - Injection API (used in your project)
+  - Generator Framework (runs standalone, not bundled into your code)
 
-1. Add the Analyzer and GodInject .dll files to your project.
-    - Add Analyzer as a Analyzer:
-      ```
-        <Analyzer Include="your_path\GodInject.Analyzers.dll"></Analyzer>
-      ```
-    - Add GodInject as a Reference:
-      ```
-        <Reference Include="GodInject">
-          <HintPath>your_path\GodInject.dll</HintPath>
-        </Reference>
-      ```
-3. Ensure **DryIoc.dll** is included in your project
-   - Add this inside csproj:
-      ```
-      	<ItemGroup>
-      		<PackageReference Include="DryIoc.dll" Version="5.4.3" />
-      	</ItemGroup>
-      ```
-4. Initialize the DI container at startup.
+### 2. Add Prebuild Hook to Your .csproj
+exec.conf is not needed but it's very useful to make clean project outputs
+```cs
+<Target Name="GenerationFrameworkRun" BeforeTargets="BeforeBuild">
+  <Exec Command='dotnet "$(ProjectDir).../GodInject.Prebuild.dll" "$(ProjectDir)YourProject.csproj" "$(ProjectDir)/tools/Generators/exec.conf"' />
+</Target>
+```
+💡 Tips:
+  - $(ProjectDir) ends with / – avoid double slashes.
+  - dotnet is used for cross-platform execution.
+  - Paths must point to:
+      - Prebuild DLL
+      - Your .csproj
+      - exec.conf (optional but helps with clean outputs)
+
+### 3. Run a Build
+Confirm the generator runs and your output structure looks right.
+
+### 4. Add the Generator Mod
+Place GodInject.Generator.dll into the Mods folder of the generator framework.
+
+### 5. Reference the Injection API in Your Project
+  ```
+    <Reference Include="GodInject">
+      <HintPath>PATH_TO\GodInject.dll</HintPath>
+    </Reference>
+  ```
+### 6. Ensure DryIoc is Included
+  ```
+    <ItemGroup>
+      <PackageReference Include="DryIoc.dll" Version="5.4.3" />
+    </ItemGroup>
+  ```
+### 7. FOR GODOT:
+In `exec.conf` include path to the GodotSharp.dll
+ReferencesRelativePaths = [ "./.godot/mono/temp/bin/Debug/GodotSharp.dll" ]
+
+## Recommended project structure
+
+```
+tools/
+  Generators/
+    Generator/                # Contains GodInject.Prebuild.dll + dependencies
+    Output/                   # Auto-generated
+    Mods/                     # Auto-generated (drop GodInject.Generator.dll here)
+    exec.conf                 # Configuration file
+```
+
+`exec.conf` example:
+```toml
+GeneratorFilesRelativePath = "./tools/Generators/"
+GeneratedFilesOutputDirName = "Output"
+ReferencesRelativePaths = [ ]
+GeneratorModsRelativePath = "./tools/Generators/Mods"
+```
+With this setup:
+  - Your build process remains clean.
+  - All tools stay decoupled from your main project runtime.
+
+## Quick Note on the New Generation System
+
+Since v2.0.0, code is now generated before build time using a custom standalone generator framework. This improves compatibility with Godot and other engines. The generator runs separately and does not affect your project build output.
 
 ## Getting Started
 
